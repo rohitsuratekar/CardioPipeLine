@@ -19,6 +19,7 @@ fi
 ${TOOL_HISAT}/hisat2 --version
 ${TOOL_HISAT}/hisat2-build --version
 ${TOOL_FASTQC}/fastqc --version
+${TOOL_STAR}/STAR --version
 
 if ! [[ -e "${TOOL_SORTMERNA}/scripts/merge-paired-reads.sh" ]]; then
      echo "scripts/merge-paired-reads.sh does not exist"
@@ -36,7 +37,7 @@ if ! [[ -e "${TOOL_SORTMERNA}/bin/indexdb" ]]; then
 fi
 
 if ! [[ -e "${TOOL_SORTMERNA}/bin/sortmerna" ]]; then
-     echo "bin/indexdb does not exist"
+     echo "bin/sortmerna does not exist"
      exit 1
 fi
 
