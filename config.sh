@@ -5,6 +5,8 @@ source ./local.sh  # For importing local variable. You can remove this line and 
 
 
 SRA_ID="SRX4720625" #ID of SRA file. This will be used in many output and input names
+GENOME_FASTA="Danio_rerio.GRCz11.dna.primary_assembly.fa" #Name of the fasta reference file
+GENOME_ANNOTATION="Danio_rerio.GRCz11.96.chr.gtf" # Genome Annotation file
 
 # Log related options
 LOG="log.txt" # Name of the log file
@@ -28,6 +30,7 @@ TOOL_SORTMERNA="$TOOL/sortmerna-3.0.3"
 TOOL_FASTQC="$TOOL/FastQC"
 TOOL_STAR="$TOOL/STAR-2.7.1a/source"
 TOOL_SAMTOOL="$TOOL/samtools-1.9"
+TOOL_STRINGTIE="$TOOL/stringtie-1.3.4d.Linux_x86_64"
 
 
 # Log Function

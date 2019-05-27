@@ -6,4 +6,4 @@
 #bash ./preprocessing/requirement.sh -e
 
 #bash ./alignment/star_alignment.sh
-bash ./process_sam_bam.sh
+bash ./postprocessing/process_sam_bam.sh

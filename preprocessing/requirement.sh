@@ -21,6 +21,7 @@ ${TOOL_HISAT}/hisat2-build --version
 ${TOOL_FASTQC}/fastqc --version
 ${TOOL_STAR}/STAR --version
 ${TOOL_SAMTOOL}/samtools --version
+${TOOL_STRINGTIE}/stringtie --version
 
 if ! [[ -e "${TOOL_SORTMERNA}/scripts/merge-paired-reads.sh" ]]; then
      echo "scripts/merge-paired-reads.sh does not exist"
