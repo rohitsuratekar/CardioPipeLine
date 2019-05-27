@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # This script checks requirement of pipeline. 
 
-source config.sh
+source ./config.sh
 
 # Check if all the tools are available
 
@@ -20,6 +20,7 @@ ${TOOL_HISAT}/hisat2 --version
 ${TOOL_HISAT}/hisat2-build --version
 ${TOOL_FASTQC}/fastqc --version
 ${TOOL_STAR}/STAR --version
+${TOOL_SAMTOOL}/samtools --version
 
 if ! [[ -e "${TOOL_SORTMERNA}/scripts/merge-paired-reads.sh" ]]; then
      echo "scripts/merge-paired-reads.sh does not exist"

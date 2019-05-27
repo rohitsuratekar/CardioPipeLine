@@ -3,10 +3,13 @@
 
 source ./local.sh  # For importing local variable. You can remove this line and use your own "ORIGIN_LOCAL"
 
+
+SRA_ID="SRX4720625" #ID of SRA file. This will be used in many output and input names
+
 # Log related options
 LOG="log.txt" # Name of the log file
 LOG_ENABLED=0 # 1=Yes and 0=NO (Add to Log File)
-LOG_DISPLAY=1 # 1=Yes and 0=No (Display on Terminal)
+LOG_DISPLAY=0 # 1=Yes and 0=No (Display on Terminal)
 
 # Various paths
 ORIGIN=${ORIGIN_LOCAL} # Base folder for everything e.g /home/user/path/to/base/folder
@@ -24,6 +27,7 @@ TOOL_HT_SEQ="$TOOL/htseq-release_0.11.0"
 TOOL_SORTMERNA="$TOOL/sortmerna-3.0.3"
 TOOL_FASTQC="$TOOL/FastQC"
 TOOL_STAR="$TOOL/STAR-2.7.1a/source"
+TOOL_SAMTOOL="$TOOL/samtools-1.9"
 
 
 # Log Function

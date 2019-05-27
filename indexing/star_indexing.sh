@@ -18,9 +18,9 @@ rm -r -f ${GENOME_HOME}/index/star
 # Make new folder for keeping index files
 mkdir -p ${GENOME_HOME}/index/star
 
-STAR_INDEX_PATH="index/star"
-STAR_REF_FILE="Danio_rerio.GRCz11.dna.only_chromosomes.fa"
-STAR_ANNOTATION_FILE="Danio_rerio.GRCz11.96.chr.gtf"
+readonly STAR_INDEX_PATH="index/star"
+readonly STAR_REF_FILE="Danio_rerio.GRCz11.dna.only_chromosomes.fa"
+readonly STAR_ANNOTATION_FILE="Danio_rerio.GRCz11.96.chr.gtf"
 
 
 ${TOOL_STAR}/STAR \

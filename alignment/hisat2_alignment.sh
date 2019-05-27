@@ -19,7 +19,7 @@
 # -2 : Read 2
 # -S : Output SAM file
 
-source ./config.sh
+source ../config.sh
 
 readonly INDEX_FILE="zebrafish_index.fasta"
 readonly SAMPLE_NAME="control_GFP"
