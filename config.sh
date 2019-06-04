@@ -11,7 +11,7 @@ GENOME_ANNOTATION="Danio_rerio.GRCz11.96.chr.gtf" # Genome Annotation file
 # Log related options
 LOG="log.txt" # Name of the log file
 LOG_ENABLED=0 # 1=Yes and 0=NO (Add to Log File)
-LOG_DISPLAY=0 # 1=Yes and 0=No (Display on Terminal)
+LOG_DISPLAY=1 # 1=Yes and 0=No (Display on Terminal)
 
 # Various paths
 ORIGIN=${ORIGIN_LOCAL} # Base folder for everything e.g /home/user/path/to/base/folder
@@ -19,6 +19,10 @@ GENOME_HOME="$ORIGIN/Genome" # Standard genomes and their indexes
 TOOL="$ORIGIN/Tools" # Tools involved in this pipeline
 PIPE="$ORIGIN/Pipeline" # All pipeline scripts
 DATA="$ORIGIN/Data" # All experimental data files
+NCBI_DOWNLOAD=${NCBI_LOCAL} # /home/user/ncbi/public/sra
+RAW_DATA="$DATA/raw" # Here all downloaded raw data will be stored
+
+mkdir -p ${RAW_DATA} # Make folder for raw data if not present
 
 
 # All Tools paths
