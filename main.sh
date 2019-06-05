@@ -7,4 +7,5 @@ bash ./process_rrna.sh
 #bash ./preprocessing/requirement.sh -e
 
 #bash ./alignment/star_alignment.sh
-# bash ./postprocessing/process_sam_bam.sh
+#bash ./postprocessing/process_sam_bam.sh
+

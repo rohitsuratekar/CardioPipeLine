@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Processes the dta file for rRNA contamination
+# Processes the data file for rRNA contamination
 
 
 source ./config.sh
@@ -45,7 +45,7 @@ find ${R_RNA_PATH} -name "*.fasta" -maxdepth 1 |
         if [[ -n $(find "${R_RNA_PATH}/index/" -name "${name}*") ]]; then
             log "Indexing has already done for ${name}"
         else
-            ${TOOL_SORTMERNA}/bin/indexdb --ref ${f},${R_RNA_PATH}/index/${name}.idx -v # Make Index
+            ${TOOL_SORTMERNA}/bin/indexdb --ref ${f},${R_RNA_PATH}/index/${name}${R_RNA_INDEX_EXTENSION} -v # Make Index
         fi
     done
 
@@ -61,10 +61,57 @@ mkdir -p ${MERGE_FOLDER}
 readonly FORWARD_READS="${DATA}/${SRA_ID}_1.fastq"
 readonly REVERSE_READS="${DATA}/${SRA_ID}_2.fastq"
 
-if [[ -n $(find ${MERGE_FOLDER} -name "${SRA_ID}_merged.fastq") ]]; then
+if [[ -n $(find ${MERGE_FOLDER} -name "${SRA_ID}${READ_MERGED_EXTENSION}") ]]; then
     log "Merged file already exists in '${MERGE_FOLDER}'"
 else
-    ${TOOL_SORTMERNA}/scripts/merge-paired-reads.sh ${FORWARD_READS} ${REVERSE_READS} "${MERGE_FOLDER}/${SRA_ID}_merged.fastq"
+    ${TOOL_SORTMERNA}/scripts/merge-paired-reads.sh \
+    ${FORWARD_READS} \
+    ${REVERSE_READS} \
+    "${MERGE_FOLDER}/${SRA_ID}${READ_MERGED_EXTENSION}"
+
     log "Merged reads generated for rRNA filtering"
 fi
+
+# Generate sequence that can be used with SortMeRNA command
+
+REF_SEQ=""
+while read f;
+do
+    name=$(echo ${f}| xargs -I {} basename {} ) # Get file name
+    REF_SEQ="${REF_SEQ}${f},${R_RNA_PATH}/index/${name}${R_RNA_INDEX_EXTENSION}:"
+done <<< $(find ${R_RNA_PATH} -maxdepth 1 -name "*.fasta" -type f)
+
+REF_SEQ=$(echo ${REF_SEQ} | sed 's/.$//g')
+
+log "rRNA filtering initiating"
+
+# Make folder to keep aligned sequences
+
+ALIGNED_FOLDER="${DATA}/aligned"
+mkdir -p ${ALIGNED_FOLDER}
+
+# Make Folder for Key-value data-store
+
+KVDS_PATH="${DATA}/aligned/kvds"
+rm -rf ${KVDS_PATH} # This is needed because sortmerna script won't run if this folder is non-empty
+mkdir -p ${KVDS_PATH}
+
+# Start SortMeRNA
+#
+# --ref : rRNA reference sequences and their indices
+# --reads : Merged Fasta file
+# --aligned : Aligned file name and path
+# --fastx : fasta format
+# -v : Verbose output
+# -a : number of threads (if you don't know how many core your system has, you can ommit this option)
+# -d : key value data store dictionary path (This option is needed because sortmerna won't delete kvds folder file by itself)
+
+${TOOL_SORTMERNA}/bin/sortmerna \
+--ref ${REF_SEQ} \
+--reads "${MERGE_FOLDER}/${SRA_ID}${READ_MERGED_EXTENSION}" \
+--aligned "${ALIGNED_FOLDER}/${SRA_ID}${R_RNA_ALIGNED_EXTENSION}" \
+--fastx \
+-v \
+-a 8 \
+-d ${KVDS_PATH}
 
