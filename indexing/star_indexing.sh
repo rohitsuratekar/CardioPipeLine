@@ -12,20 +12,26 @@
 
 source ./config.sh
 
+readonly STAR_INDEX_PATH="index/star"
+
+log "Deleting all existing STAR indices"
+
 # Delete all existing files
-rm -r -f ${GENOME_HOME}/index/star
+rm -r -f "${GENOME_HOME}/${STAR_INDEX_PATH}"
 
 # Make new folder for keeping index files
-mkdir -p ${GENOME_HOME}/index/star
+mkdir -p "${GENOME_HOME}/${STAR_INDEX_PATH}"
 
-readonly STAR_INDEX_PATH="index/star"
-readonly STAR_REF_FILE="Danio_rerio.GRCz11.dna.only_chromosomes.fa"
-readonly STAR_ANNOTATION_FILE="Danio_rerio.GRCz11.96.chr.gtf"
+
+log "STAR Indexing started"
 
 
 ${TOOL_STAR}/STAR \
 --runThreadN 8 \
 --runMode genomeGenerate \
 --genomeDir ${GENOME_HOME}/${STAR_INDEX_PATH} \
---genomeFastaFiles ${GENOME_HOME}/${STAR_REF_FILE} \
---sjdbGTFfile ${GENOME_HOME}/${STAR_ANNOTATION_FILE}
+--genomeFastaFiles ${GENOME_HOME}/${GENOME_FASTA} \
+--sjdbGTFfile ${GENOME_HOME}/${GENOME_ANNOTATION}
+
+
+log "STAR Indexing completed"

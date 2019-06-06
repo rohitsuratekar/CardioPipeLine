@@ -2,7 +2,6 @@
 #
 # Processes the data file for rRNA contamination
 
-
 source ./config.sh
 
 log "Checking for rRNA contamination"
@@ -87,31 +86,93 @@ log "rRNA filtering initiating"
 
 # Make folder to keep aligned sequences
 
-ALIGNED_FOLDER="${DATA}/aligned"
-mkdir -p ${ALIGNED_FOLDER}
+FILTERED_FOLDER="${DATA}/filtering"
+mkdir -p ${FILTERED_FOLDER}
 
 # Make Folder for Key-value data-store
 
-KVDS_PATH="${DATA}/aligned/kvds"
+KVDS_PATH="${DATA}/filtering/kvds"
 rm -rf ${KVDS_PATH} # This is needed because sortmerna script won't run if this folder is non-empty
 mkdir -p ${KVDS_PATH}
+
 
 # Start SortMeRNA
 #
 # --ref : rRNA reference sequences and their indices
 # --reads : Merged Fasta file
 # --aligned : Aligned file name and path
+# --other : non-aligned file name and path (this is non-rRNA)
 # --fastx : fasta format
+# --log : Creates log files
 # -v : Verbose output
 # -a : number of threads (if you don't know how many core your system has, you can ommit this option)
 # -d : key value data store dictionary path (This option is needed because sortmerna won't delete kvds folder file by itself)
+# --paired_in : If either one from forward or reverse read matches, it will be in aligned file
 
-${TOOL_SORTMERNA}/bin/sortmerna \
---ref ${REF_SEQ} \
---reads "${MERGE_FOLDER}/${SRA_ID}${READ_MERGED_EXTENSION}" \
---aligned "${ALIGNED_FOLDER}/${SRA_ID}${R_RNA_ALIGNED_EXTENSION}" \
---fastx \
--v \
--a 8 \
--d ${KVDS_PATH}
+# Check if Filtered sequence is present
 
+if [[ -n $(find "${FILTERED_FOLDER}" -maxdepth 1 -type f -name "${SRA_ID}${R_RNA_FILTERED_EXTENSION}.fastq") ]]; then
+    log "Filtered file already exist. Skipping rRNA filtering"
+else
+    log "starting rRNA filtering"
+
+    ${TOOL_SORTMERNA}/bin/sortmerna \
+    --ref ${REF_SEQ} \
+    --reads "${MERGE_FOLDER}/${SRA_ID}${READ_MERGED_EXTENSION}" \
+    --aligned "${FILTERED_FOLDER}/${SRA_ID}_rRNA" \
+    --other "${FILTERED_FOLDER}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}" \
+    --fastx \
+    --paired_in \
+    --log \
+    -v \
+    -a 8 \
+    -d ${KVDS_PATH}
+
+    log "rRNA filtering completed"
+fi
+
+# Split the files
+
+
+
+TEMP3=$(find ${FILTERED_FOLDER} -maxdepth 1 -type f -name "${SRA_ID}${R_RNA_FILTERED_EXTENSION}_*.fastq" | wc -l)
+
+if [[ ${TEMP3} -eq 2 ]]; then
+    log "${TEMP3} filtered-split sequences already exists in ${FILTERED_FOLDER}"
+    log "Skipping splitting of filtered sequence"
+else
+    log "Splitting filtered sequence"
+
+    ${TOOL_SORTMERNA}/scripts/unmerge-paired-reads.sh \
+    "${FILTERED_FOLDER}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}.fastq" \
+    "${FILTERED_FOLDER}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}_1.fastq" \
+    "${FILTERED_FOLDER}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}_2.fastq"
+
+    log "Splitting completed in folder ${FILTERED_FOLDER}"
+fi
+
+log "Checking quality of filtered files"
+
+# Make folder to keep analysis files
+QUALITY_FOLDER="${DATA}/quality/${SRA_ID}/"
+mkdir -p ${QUALITY_FOLDER}
+
+# Get all the fastq files for analysis
+
+# Check if quality analysis is already done
+find ${FILTERED_FOLDER} -maxdepth 1 -name "${SRA_ID}${R_RNA_FILTERED_EXTENSION}_*.fastq" |
+while read f;
+do
+    name=$(echo ${f}| xargs -I {} basename {} )
+    check_name=$(echo ${name} | sed -r 's/\.fastq/\_/')
+    if [[ -n $(find ${QUALITY_FOLDER} -name "${check_name}*") ]]; then
+        log "Quality score already exists for ${name}. Skipping calculation of quality"
+    else
+        ${TOOL_FASTQC}/fastqc \
+        ${f} \
+        --outdir=${QUALITY_FOLDER} # Output Folder for generated result files
+    fi
+done
+
+log "Quality checked for filtered FASTQ files. results can be found in '${QUALITY_FOLDER}'"
+log "All files are ready for final alignment"

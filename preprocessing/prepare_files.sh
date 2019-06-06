@@ -64,7 +64,7 @@ mkdir -p ${QUALITY_FOLDER}
 # Get all the fastq files for analysis
 
 # Check if quality analysis is already done
-find ${DATA} -name "${SRA_ID}*.fastq" -maxdepth 1 |
+find ${DATA} -maxdepth 1 -name "${SRA_ID}*.fastq" |
 while read f;
 do
     name=$(echo ${f}| xargs -I {} basename {} )

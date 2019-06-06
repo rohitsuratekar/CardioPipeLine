@@ -8,7 +8,7 @@ SRA_ID="SRX4720625" #ID of SRA file. This will be used in many output and input 
 GENOME_FASTA="Danio_rerio.GRCz11.dna.primary_assembly.fa" #Name of the fasta reference file
 GENOME_ANNOTATION="Danio_rerio.GRCz11.96.chr.gtf" # Genome Annotation file
 R_RNA_INDEX_EXTENSION=".idx" # Extension which will be added at the end of rRNA index file
-R_RNA_ALIGNED_EXTENSION=".aligned" # Extension which will be added at the end of aligned rRNA filtered sequence
+R_RNA_FILTERED_EXTENSION=".filtered" # Extension which will be added at the end of aligned rRNA filtered sequence
 READ_MERGED_EXTENSION="_merged.fastq" # Extension will be added at the end of merged file
 
 # Log related options

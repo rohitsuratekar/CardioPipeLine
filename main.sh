@@ -2,10 +2,11 @@
 
 #bash -e ./preprocessing/requirement.sh
 # bash ./preprocessing/prepare_files.sh
-bash ./process_rrna.sh
+# bash ./preprocessing/process_rrna.sh
 
-#bash ./preprocessing/requirement.sh -e
+#bash ./indexing/star_indexing.sh
 
 #bash ./alignment/star_alignment.sh
-#bash ./postprocessing/process_sam_bam.sh
+
+bash ./clean_files.sh
 
