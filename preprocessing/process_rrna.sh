@@ -36,7 +36,7 @@ fi
 
 log "Starting rRNA indexing"
 
-find ${R_RNA_PATH} -name "*.fasta" -maxdepth 1 |
+find ${R_RNA_PATH} -maxdepth 1 -name "*.fasta" |
     while read f;
     do
         name=$(echo ${f}| xargs -I {} basename {} ) # Get file name

@@ -34,7 +34,7 @@ log "File '${SRA_ID}.sra' is ready for further processing"
 #--outdir : If we want output in different dictionary
 #PATH/TO/SRA_FILE : Full path of file
 
-readonly TEMP1=$(find ${DATA} -name "${SRA_ID}*.fastq" -maxdepth 1 | wc -l)
+readonly TEMP1=$(find ${DATA} -maxdepth 1 -name "${SRA_ID}*.fastq" | wc -l)
 
 log "Checking if FASTQ file exists"
 if [[ ${TEMP1} -gt 0 ]]; then

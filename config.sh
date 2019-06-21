@@ -4,7 +4,7 @@
 source ./local.sh  # For importing local variable. You can remove this line and use your own "ORIGIN_LOCAL"
 
 
-SRA_ID="SRX4720625" #ID of SRA file. This will be used in many output and input names
+SRA_ID="SRX4157236" #ID of SRA file. This will be used in many output and input names
 GENOME_FASTA="Danio_rerio.GRCz11.dna.primary_assembly.fa" #Name of the fasta reference file
 GENOME_ANNOTATION="Danio_rerio.GRCz11.96.chr.gtf" # Genome Annotation file
 R_RNA_INDEX_EXTENSION=".idx" # Extension which will be added at the end of rRNA index file
@@ -12,8 +12,8 @@ R_RNA_FILTERED_EXTENSION=".filtered" # Extension which will be added at the end 
 READ_MERGED_EXTENSION="_merged.fastq" # Extension will be added at the end of merged file
 
 # Log related options
-LOG="log.txt" # Name of the log file
-LOG_ENABLED=0 # 1=Yes and 0=NO (Add to Log File)
+LOG="script_log.txt" # Name of the log file
+LOG_ENABLED=1 # 1=Yes and 0=NO (Add to Log File)
 LOG_DISPLAY=1 # 1=Yes and 0=No (Display on Terminal)
 
 # Various paths
