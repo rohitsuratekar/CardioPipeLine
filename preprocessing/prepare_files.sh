@@ -34,7 +34,7 @@ log "File '${SRA_ID}.sra' is ready for further processing"
 #--outdir : If we want output in different dictionary
 #PATH/TO/SRA_FILE : Full path of file
 
-readonly TEMP1=$(find ${DATA} -maxdepth 1 -name "${SRA_ID}*.fastq" | wc -l)
+readonly TEMP1=$(find ${DATA} -maxdepth 1 -name "${SRA_ID}*.fastq" -size +0M | wc -l)
 
 log "Checking if FASTQ file exists"
 if [[ ${TEMP1} -gt 0 ]]; then
@@ -64,12 +64,12 @@ mkdir -p ${QUALITY_FOLDER}
 # Get all the fastq files for analysis
 
 # Check if quality analysis is already done
-find ${DATA} -maxdepth 1 -name "${SRA_ID}*.fastq" |
+find ${DATA} -maxdepth 1 -name "${SRA_ID}*.fastq" -size +0M |
 while read f;
 do
     name=$(echo ${f}| xargs -I {} basename {} )
     check_name=$(echo ${name} | sed "s/\./\_/g")
-    if [[ -n $(find ${QUALITY_FOLDER} -name "${check_name}*") ]]; then
+    if [[ -n $(find ${QUALITY_FOLDER} -name "${check_name}*" -size +0M) ]]; then
         log "Quality score already exists for ${name}. Skipping calculation of quality"
     else
         ${TOOL_FASTQC}/fastqc \

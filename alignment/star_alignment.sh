@@ -9,14 +9,22 @@
 
 source ./config.sh
 
-readonly STAR_INDEX_PATH="index/star"
-readonly READ_1="${DATA}/filtering/${SRA_ID}${R_RNA_FILTERED_EXTENSION}_1.fastq"
-readonly READ_2="${DATA}/filtering/${SRA_ID}${R_RNA_FILTERED_EXTENSION}_2.fastq"
-readonly OUTPUT_PATH="${DATA}/aligned/${SRA_ID}"
+STAR_INDEX_PATH="index/star"
+READ_1="${DATA}/filtering/${SRA_ID}${R_RNA_FILTERED_EXTENSION}_1.fastq"
+READ_2="${DATA}/filtering/${SRA_ID}${R_RNA_FILTERED_EXTENSION}_2.fastq"
+OUTPUT_PATH="${DATA}/aligned/${SRA_ID}"
 mkdir -p ${OUTPUT_PATH}
-readonly OUTPUT_FILE="${OUTPUT_PATH}/${SRA_ID}_"
+OUTPUT_FILE="${OUTPUT_PATH}/${SRA_ID}_"
 
-log "Initializing STAR Alignment"
+if [[ ${SKIP_RNA_FILTERING} -eq 1 ]]; then
+    log "rRNA filtering is not done. Using file without rRNA filtering"
+    READ_1="${DATA}/${SRA_ID}_1.fastq"
+    READ_2="${DATA}/${SRA_ID}_2.fastq"
+else
+    log "Initializing STAR Alignment"
+fi
+
+
 
 ${TOOL_STAR}/STAR \
 --runThreadN 8 \

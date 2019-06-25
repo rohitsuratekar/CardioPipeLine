@@ -16,6 +16,9 @@ LOG="script_log.txt" # Name of the log file
 LOG_ENABLED=1 # 1=Yes and 0=NO (Add to Log File)
 LOG_DISPLAY=1 # 1=Yes and 0=No (Display on Terminal)
 
+# Other configuration
+SKIP_RNA_FILTERING=1 # 1=Yes and 0=No (If Yes, it will skip rRNA Filtering)
+
 # Various paths
 ORIGIN=${ORIGIN_LOCAL} # Base folder for everything e.g /home/user/path/to/base/folder
 GENOME_HOME="$ORIGIN/Genome" # Standard genomes and their indexes

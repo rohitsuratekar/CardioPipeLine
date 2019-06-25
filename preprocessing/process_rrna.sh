@@ -60,7 +60,7 @@ mkdir -p ${MERGE_FOLDER}
 readonly FORWARD_READS="${DATA}/${SRA_ID}_1.fastq"
 readonly REVERSE_READS="${DATA}/${SRA_ID}_2.fastq"
 
-if [[ -n $(find ${MERGE_FOLDER} -name "${SRA_ID}${READ_MERGED_EXTENSION}") ]]; then
+if [[ -n $(find ${MERGE_FOLDER} -name "${SRA_ID}${READ_MERGED_EXTENSION}" -size +0M) ]]; then
     log "Merged file already exists in '${MERGE_FOLDER}'"
 else
     ${TOOL_SORTMERNA}/scripts/merge-paired-reads.sh \
@@ -78,7 +78,7 @@ while read f;
 do
     name=$(echo ${f}| xargs -I {} basename {} ) # Get file name
     REF_SEQ="${REF_SEQ}${f},${R_RNA_PATH}/index/${name}${R_RNA_INDEX_EXTENSION}:"
-done <<< $(find ${R_RNA_PATH} -maxdepth 1 -name "*.fasta" -type f)
+done <<< $(find ${R_RNA_PATH} -maxdepth 1 -name "*.fasta" -type f -size +0M)
 
 REF_SEQ=$(echo ${REF_SEQ} | sed 's/.$//g')
 
@@ -111,68 +111,71 @@ mkdir -p ${KVDS_PATH}
 
 # Check if Filtered sequence is present
 
-if [[ -n $(find "${FILTERED_FOLDER}" -maxdepth 1 -type f -name "${SRA_ID}${R_RNA_FILTERED_EXTENSION}.fastq") ]]; then
-    log "Filtered file already exist. Skipping rRNA filtering"
+if [[ ${SKIP_RNA_FILTERING} -eq 1 ]]; then
+    log "Skipping rRNA filtering"
 else
-    log "starting rRNA filtering"
 
-    ${TOOL_SORTMERNA}/bin/sortmerna \
-    --ref ${REF_SEQ} \
-    --reads "${MERGE_FOLDER}/${SRA_ID}${READ_MERGED_EXTENSION}" \
-    --aligned "${FILTERED_FOLDER}/${SRA_ID}_rRNA" \
-    --other "${FILTERED_FOLDER}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}" \
-    --fastx \
-    --paired_in \
-    --log \
-    -v \
-    -a 8 \
-    -d ${KVDS_PATH}
-
-    log "rRNA filtering completed"
-fi
-
-# Split the files
-
-
-
-TEMP3=$(find ${FILTERED_FOLDER} -maxdepth 1 -type f -name "${SRA_ID}${R_RNA_FILTERED_EXTENSION}_*.fastq" | wc -l)
-
-if [[ ${TEMP3} -eq 2 ]]; then
-    log "${TEMP3} filtered-split sequences already exists in ${FILTERED_FOLDER}"
-    log "Skipping splitting of filtered sequence"
-else
-    log "Splitting filtered sequence"
-
-    ${TOOL_SORTMERNA}/scripts/unmerge-paired-reads.sh \
-    "${FILTERED_FOLDER}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}.fastq" \
-    "${FILTERED_FOLDER}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}_1.fastq" \
-    "${FILTERED_FOLDER}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}_2.fastq"
-
-    log "Splitting completed in folder ${FILTERED_FOLDER}"
-fi
-
-log "Checking quality of filtered files"
-
-# Make folder to keep analysis files
-QUALITY_FOLDER="${DATA}/quality/${SRA_ID}/"
-mkdir -p ${QUALITY_FOLDER}
-
-# Get all the fastq files for analysis
-
-# Check if quality analysis is already done
-find ${FILTERED_FOLDER} -maxdepth 1 -name "${SRA_ID}${R_RNA_FILTERED_EXTENSION}_*.fastq" |
-while read f;
-do
-    name=$(echo ${f}| xargs -I {} basename {} )
-    check_name=$(echo ${name} | sed -r 's/\.fastq/\_/')
-    if [[ -n $(find ${QUALITY_FOLDER} -name "${check_name}*") ]]; then
-        log "Quality score already exists for ${name}. Skipping calculation of quality"
+    if [[ -n $(find "${FILTERED_FOLDER}" -maxdepth 1 -type f -name "${SRA_ID}${R_RNA_FILTERED_EXTENSION}.fastq" -size +0M) ]]; then
+        log "Filtered file already exist. Skipping rRNA filtering"
     else
-        ${TOOL_FASTQC}/fastqc \
-        ${f} \
-        --outdir=${QUALITY_FOLDER} # Output Folder for generated result files
-    fi
-done
+        log "starting rRNA filtering"
 
-log "Quality checked for filtered FASTQ files. results can be found in '${QUALITY_FOLDER}'"
-log "All files are ready for final alignment"
+        ${TOOL_SORTMERNA}/bin/sortmerna \
+        --ref ${REF_SEQ} \
+        --reads "${MERGE_FOLDER}/${SRA_ID}${READ_MERGED_EXTENSION}" \
+        --aligned "${FILTERED_FOLDER}/${SRA_ID}_rRNA" \
+        --other "${FILTERED_FOLDER}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}" \
+        --fastx \
+        --paired_in \
+        --log \
+        -a 8 \
+        -v \
+        -d ${KVDS_PATH}
+
+        log "rRNA filtering completed"
+    fi
+
+    # Split the files
+
+    TEMP3=$(find ${FILTERED_FOLDER} -maxdepth 1 -type f -name "${SRA_ID}${R_RNA_FILTERED_EXTENSION}_*.fastq" -size +0M| wc -l)
+
+    if [[ ${TEMP3} -eq 2 ]]; then
+        log "${TEMP3} filtered-split sequences already exists in ${FILTERED_FOLDER}"
+        log "Skipping splitting of filtered sequence"
+    else
+        log "Splitting filtered sequence"
+
+        ${TOOL_SORTMERNA}/scripts/unmerge-paired-reads.sh \
+        "${FILTERED_FOLDER}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}.fastq" \
+        "${FILTERED_FOLDER}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}_1.fastq" \
+        "${FILTERED_FOLDER}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}_2.fastq"
+
+        log "Splitting completed in folder ${FILTERED_FOLDER}"
+    fi
+
+    log "Checking quality of filtered files"
+
+    # Make folder to keep analysis files
+    QUALITY_FOLDER="${DATA}/quality/${SRA_ID}/"
+    mkdir -p ${QUALITY_FOLDER}
+
+    # Get all the fastq files for analysis
+
+    # Check if quality analysis is already done
+    find ${FILTERED_FOLDER} -maxdepth 1 -name "${SRA_ID}${R_RNA_FILTERED_EXTENSION}_*.fastq" |
+    while read f;
+    do
+        name=$(echo ${f}| xargs -I {} basename {} )
+        check_name=$(echo ${name} | sed -r 's/\.fastq/\_/')
+        if [[ -n $(find ${QUALITY_FOLDER} -name "${check_name}*" -size +0M) ]]; then
+            log "Quality score already exists for ${name}. Skipping calculation of quality"
+        else
+            ${TOOL_FASTQC}/fastqc \
+            ${f} \
+            --outdir=${QUALITY_FOLDER} # Output Folder for generated result files
+        fi
+    done
+
+    log "Quality checked for filtered FASTQ files. results can be found in '${QUALITY_FOLDER}'"
+    log "All files are ready for final alignment"
+fi
