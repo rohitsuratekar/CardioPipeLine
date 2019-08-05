@@ -1,16 +1,9 @@
 #!/usr/bin/env bash
+#
+# Author : Rohit Suratekar
+# Date : July 2019
+#
+# Main file to run all the Pipeline
 
-#bash -e ./preprocessing/requirement.sh
-
-#bash -e ./preprocessing/prepare_files.sh
-
-#bash -e ./preprocessing/process_rrna.sh
-#
-## bash ./indexing/star_indexing.sh
-#
-bash -e ./alignment/star_alignment.sh
-#
-#bash -e ./postprocessing/process_sam_bam.sh
-#
-#bash ./postprocessing//clean_files.sh
-#
+bash ./download.sh
+bash ./prepare_files.sh
