@@ -50,7 +50,7 @@ else
 fi
 
 # Check if script is successful
-if [[ "$?" -eq 1 ]]; then
+if [[ "$?" -ne 0 ]]; then
   log "Unable to convert into FASTQ files. Exiting script"
   exit 1
 else
