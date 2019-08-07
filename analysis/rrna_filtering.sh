@@ -55,8 +55,7 @@ log "rRNA filtering initiating"
 
 # Make folder to keep aligned sequences
 
-FILTERED_FOLDER="${DATA}/filtering"
-mkdir -p "${FILTERED_FOLDER}"
+mkdir -p "${FOLDER_FILTERED}"
 
 # Make Folder for Key-value data-store
 
@@ -96,7 +95,7 @@ filter_rrna() {
       -v \
       -d "${KVDS_PATH}"
 
-    # Check if script is successful
+    # Check if command is successful
     if [[ "$?" -ne 0 ]]; then
       log "Unable to filter sequence with rRNA. Exiting script"
       exit 1
@@ -108,6 +107,29 @@ filter_rrna() {
 
 }
 
-filter_rrna "${FILTERED_FOLDER}" "${REF_SEQ}" "${MERGE_FOLDER}"
+# Start filtering
+filter_rrna "${FOLDER_FILTERED}" "${REF_SEQ}" "${MERGE_FOLDER}"
 
-# TODO: Split the files and check quality
+# Split the merged file from SortMeRNA
+TEMP3=$(find "${FOLDER_FILTERED}" -maxdepth 1 -type f -name "${SRA_ID}${R_RNA_FILTERED_EXTENSION}_*.fastq" -size +0M | wc -l)
+
+if [[ ${TEMP3} -eq 2 ]]; then
+  log "${TEMP3} filtered-split sequences already exists in ${FOLDER_FILTERED}"
+  log "Skipping splitting of filtered sequence"
+else
+  log "Splitting filtered sequence"
+
+  "${TOOL_SORTMERNA}"/scripts/unmerge-paired-reads.sh \
+    "${FOLDER_FILTERED}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}.fastq" \
+    "${FOLDER_FILTERED}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}_1.fastq" \
+    "${FOLDER_FILTERED}/${SRA_ID}${R_RNA_FILTERED_EXTENSION}_2.fastq"
+
+  # Check if command is successful
+  if [[ "$?" -ne 0 ]]; then
+    log "Unable to filter sequence with rRNA. Exiting script"
+    exit 1
+  else
+    log "Splitting completed in folder ${FOLDER_FILTERED}"
+  fi
+
+fi

@@ -34,7 +34,7 @@ QUALITY_INPUT="${DATA}"
 # Check for any argument given and make the prefix out of it
 if [[ $1 == "-f" ]]; then
   QUALITY_SUFFIX="_FILTERED"
-  QUALITY_INPUT="${DATA}/filtering"
+  QUALITY_INPUT="${FILTERED_FOLDER}"
 fi
 
 # Make folder to keep analysis files

@@ -13,7 +13,7 @@ source ./constants/files.sh #Imports file names and extensions
 # SRA ID for the analysis
 SRA_ID="SRX4720634"
 
-CHECK_SEQ_QUALITY=0 # 0=NO, 1 = YESv
+CHECK_SEQ_QUALITY=1 # 0=NO, 1 = YESv
 RNA_FILTERING=1     # 1=Yes and 0=No (If Yes, it will perform rRNA Filtering)
 
 SCRIPT_DELAY=2 # Delay between two scripts (in seconds)

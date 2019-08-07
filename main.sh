@@ -9,4 +9,7 @@
 #bash ./analysis/prepare_files.sh
 #bash ./helpers/check_quality.sh -r
 #bash ./analysis/index_rrna.sh
-bash ./analysis/rrna_filtering.sh
+#bash ./analysis/rrna_filtering.sh
+#bash ./helpers/check_quality.sh -f
+#bash ./analysis/star_alignment.sh
+bash ./analysis/post_process_sam.sh

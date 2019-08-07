@@ -7,13 +7,15 @@
 source ./local.sh
 
 # Various paths
-ORIGIN=${LOCAL_FOLDER}       # Base folder for everything e.g /home/user/path/to/base/folder
-GENOME_HOME="$ORIGIN/Genome" # Standard genomes and their indexes
-TOOL="$ORIGIN/Tools"         # Tools involved in this pipeline
-PIPE="$ORIGIN/Pipeline"      # All pipeline scripts
-DATA="$ORIGIN/Data"          # All experimental data files
-NCBI_DOWNLOAD=${NCBI_LOCAL}  # /home/user/ncbi/public/sra
-RAW_DATA="$DATA/raw"         # Here all downloaded raw data will be stored
+ORIGIN=${LOCAL_FOLDER}                 # Base folder for everything e.g /home/user/path/to/base/folder
+GENOME_HOME="$ORIGIN/Genome"           # Standard genomes and their indexes
+TOOL="$ORIGIN/Tools"                   # Tools involved in this pipeline
+PIPE="$ORIGIN/Pipeline"                # All pipeline scripts
+DATA="$ORIGIN/Data"                    # All experimental data files
+NCBI_DOWNLOAD=${NCBI_LOCAL}            # /home/user/ncbi/public/sra
+FOLDER_RAW_DATA="$DATA/raw"            # Here all downloaded raw data will be stored
+FOLDER_FILTERED="${DATA}/filtering"    # To keep all filtered files
+FOLDER_FINAL_OUTPUT="${DATA}/analysis" # TO Keep final analysis files
 
 # All Tools paths
 
@@ -28,4 +30,5 @@ TOOL_STRINGTIE="$TOOL/stringtie-1.3.4d.Linux_x86_64"
 TOOL_TRIMMOMATIC="$TOOL/Trimmomatic-0.39"
 # Additional requirements
 
-mkdir -p "${RAW_DATA}" # Make folder for raw data if not present
+mkdir -p "${FOLDER_RAW_DATA}"     # Make folder for raw data if not present
+mkdir -p "${FOLDER_FINAL_OUTPUT}" # Make folder for analysis data
