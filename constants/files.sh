@@ -1,18 +1,32 @@
 #!/usr/bin/env bash
+#===============================================================================
 #
-# Author : Rohit Suratekar
-# Date : July 2019
+#          FILE: files.sh
 #
-# Other constants
+#         USAGE: source files.sh
+#
+#   DESCRIPTION: All constants related to file names and extension will go
+#   in this files.
+#
+#        AUTHOR: Rohit Suratekar
+#  ORGANIZATION: IIMCB
+#       CREATED: Thursday 08 August 2019 10:00
+#      REVISION:  3
+#===============================================================================
 
-# Files
+
+# Genome related files
 
 GENOME_FASTA="Danio_rerio.GRCz11.dna.primary_assembly.fa" #Name of the fasta reference file
 GENOME_ANNOTATION="Danio_rerio.GRCz11.96.chr.gtf"         # Genome Annotation file
 
-# Extensions
+# File extensions
 
-R_RNA_INDEX_EXTENSION=".idx"          # Extension which will be added at the end of rRNA index file
-R_RNA_FILTERED_EXTENSION=".filtered"  # Extension which will be added at the end of aligned rRNA filtered sequence
+ # Extension which will be added at the end of rRNA index file
+EXTENSION_R_RNA_INDEX=".idx"
 
-READ_MERGED_EXTENSION="_merged.fastq" # Extension will be added at the end of merged file
+# Extension which will be added at the end of aligned rRNA filtered sequence
+EXTENSION_R_RNA_FILTERED=".filtered"
+
+# Extension will be added at the end of merged file
+EXTENSION_MERGED_READS="_merged.fastq"

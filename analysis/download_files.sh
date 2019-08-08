@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #===============================================================================
 #
-#          FILE: main.sh
+#          FILE: download_files.sh
 # 
-#         USAGE: ./main.sh 
+#         USAGE: ./download_files.sh 
 # 
-#   DESCRIPTION: Main File to run the PipeLine
+#   DESCRIPTION: 
 # 
 #       OPTIONS: ---
 #  REQUIREMENTS: ---
@@ -13,12 +13,23 @@
 #         NOTES: ---
 #        AUTHOR: Rohit Suratekar 
 #  ORGANIZATION: IIMCB
-#       CREATED: Wednesday 07 August 2019 15:20
-#      REVISION: 2
+#       CREATED: Thursday 08 August 2019 12:20
+#      REVISION: 3
 #===============================================================================
 
 set -o nounset                              # Treat unset variables as an error
 
 
+source config.sh
 
-bash ./analysis/download_files.sh
+# Download function for SRA tool
+download_sra() {
+  # Use prefetch from SRA tools to download file
+  # -v : verbose output
+  # -p 1: Show progress
+  "${TOOL_SRA}"/bin/prefetch -v -p 1 "${SRA_ID}"
+}
+
+
+check_file "Name" -p "AOmr:path"
+
