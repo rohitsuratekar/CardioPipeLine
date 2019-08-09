@@ -19,7 +19,10 @@ set -o nounset # Treat unset variables as an error
 SRA_ID="SRX4720634"
 
 # Check the quality of the sequence when it is raw and after it is filtered
-CHECK_SEQ_QUALITY=1         # 0=NO, 1 = YES
+CHECK_SEQ_QUALITY=1         # 0=NO, 1=YES
+
+# Filters rRNA with SortMeRNA
+RNA_FILTERING=1             # 0=NO, 1=YES
 
 # Source All constants and extensions
 source ./constants/paths.sh #Imports various paths

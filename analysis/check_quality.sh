@@ -42,6 +42,12 @@ while getopts ":rf" option; do
     quality_suffix="_RAW"
     ;;
   f)
+    # if rRNA filtering is OFF, skip the filtering quality
+    if [[ ${RNA_FILTERING} -eq 0 ]]; then
+      log "Quality check was skipped becasue rRNA filtering is switched off.
+       try '-r' option to check quality of the raw sequence."
+      exit 0
+    fi
     file_path="$FOLDER_FILTERING"
     quality_suffix="_FILTERED"
     ;;
