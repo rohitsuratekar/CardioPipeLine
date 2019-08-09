@@ -2,23 +2,29 @@
 #===============================================================================
 #
 #          FILE: main.sh
-# 
-#         USAGE: ./main.sh 
-# 
+#
+#         USAGE: ./main.sh
+#
 #   DESCRIPTION: Main File to run the PipeLine
-# 
+#
 #       OPTIONS: ---
 #  REQUIREMENTS: ---
 #          BUGS: ---
 #         NOTES: ---
-#        AUTHOR: Rohit Suratekar 
+#        AUTHOR: Rohit Suratekar
 #  ORGANIZATION: IIMCB
 #       CREATED: Wednesday 07 August 2019 15:20
 #      REVISION: 2
 #===============================================================================
 
-set -o nounset                              # Treat unset variables as an error
+stop() {
+  echo "Something went wrong..."
+  echo "Exiting script"
+  exit 1
+}
+trap 'stop' ERR
 
-
-
-bash ./analysis/download_files.sh
+#bash ./analysis/download_files.sh
+#bash ./analysis/prepare_files.sh
+#bash ./analysis/check_quality.sh -r
+bash ./analysis/index_rrna.sh

@@ -27,6 +27,7 @@ FOLDER_NCBI_DOWNLOAD=${NCBI_LOCAL}          # /home/user/ncbi/public/sra
 FOLDER_RAW_DATA="${FOLDER_DATA}/raw"        # Here all downloaded raw data will be stored
 FOLDER_FILTERING="${FOLDER_DATA}/filtering" # To keep all filtered files
 FOLDER_ANALYSIS="${FOLDER_DATA}/analysis"   # TO Keep final analysis files
+FOLDER_QUALITY="${FOLDER_DATA}/quality"     # TO Keep FASTQC files
 
 # All Tools paths
 TOOL_SRA="$TOOL/sratoolkit.2.9.6-1-ubuntu64"

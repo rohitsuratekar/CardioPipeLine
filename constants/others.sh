@@ -13,11 +13,11 @@
 #      REVISION: 3
 #===============================================================================
 
-set -o nounset                   # Treat unset variables as an error
+set -o nounset            # Treat unset variables as an error
 
 # Log related options
-LOG_FILE="script_log.txt"        # Name of the log file
-LOG_ENABLED=0                    # 1=Yes and 0=NO (Add to Log File)
-LOG_DISPLAY=1                    # 1=Yes and 0=No (Display on Terminal)
-RECORD_FILE="record_details.txt" # Name of the record file
-# Log Function
+LOG_FILE="script_log.txt" # Name of the log file
+LOG_ENABLED=0             # 1=Yes and 0=NO (Add to Log File)
+LOG_DISPLAY=1             # 1=Yes and 0=No (Display on Terminal)
+
+SLEEP_TIME=1 # Delay between two scripts. Used in few scripts
