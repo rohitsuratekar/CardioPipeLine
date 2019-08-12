@@ -41,7 +41,7 @@ perform_merge() {
 
   "${TOOL_SORTMERNA}"/scripts/merge-paired-reads.sh \
     "${FORWARD_READS}" "${REVERSE_READS}" \
-    "${1}/${SRA_ID}${READ_MERGED_EXTENSION}"
+    "${1}/${SRA_ID}${EXTENSION_MERGED_READS}"
 }
 
 # To avoid ambiguty, name of this function is kept different
@@ -105,11 +105,11 @@ filter_rrna() {
 REF_SEQ=""
 while read -r f; do
   name=$(echo "${f}" | xargs -I {} basename {}) # Get file name
-  REF_SEQ="${REF_SEQ}${f},${FOLDER_R_RNA}/index/${name}${EXTENSION_MERGED_READS}:"
+  REF_SEQ="${REF_SEQ}${f},${FOLDER_R_RNA_INDEX}/${name}${EXTENSION_R_RNA_INDEX}:"
 done <<<"$(find "${FOLDER_R_RNA}" -maxdepth 1 -name "*.fasta" -type f -size +1M)"
 
 # Remove last character
-REF_SEQ="echo ${REF_SEQ/.$/}"
+REF_SEQ="$(echo "${REF_SEQ/.$/}")"
 
 # Skip filtering if it is already done
 if check_file -p "$FOLDER_FILTERING" "${SRA_ID}${EXTENSION_R_RNA_FILTERED}.fastq"; then
@@ -122,13 +122,12 @@ fi
 # Check if unmerging has done or not
 # if not, perform the unmerging
 
-
 if check_file -p "$FOLDER_FILTERING" "${SRA_ID}${EXTENSION_R_RNA_FILTERED}_*.fastq"; then
   log "Filtered-split sequences already exists in ${FOLDER_FILTERING}"
   log "Skipping splitting of filtered sequence"
 else
   log "Splitting filtered sequence"
-  if unmerge_sequence ; then
+  if unmerge_sequence; then
     log "Splitting completed in folder ${FOLDER_FILTERING}"
   else
     log "Problem encountered while unmerging the sequence"

@@ -61,7 +61,7 @@ fi
 
 # Copy important log files to the analysis folder
 
-ANALYSIS_OUPUT="${FOLDER_ANALYSIS}/${SRA_ID}"
+ANALYSIS_OUPUT="${FOLDER_ANALYSIS}/${SRA_ID}/mapping"
 STAR_OUTPUT_LOG="${output_path}/${SRA_ID}_Log.final.out"
 STAR_SJ_FILE="${output_path}/${SRA_ID}_SJ.out.tab"
 

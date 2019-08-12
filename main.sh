@@ -7,9 +7,6 @@
 #
 #   DESCRIPTION: Main File to run the PipeLine
 #
-#       OPTIONS: ---
-#  REQUIREMENTS: ---
-#          BUGS: ---
 #         NOTES: ---
 #        AUTHOR: Rohit Suratekar
 #  ORGANIZATION: IIMCB

@@ -40,7 +40,7 @@ convert_to_fastq() {
     --dumpbase \
     --split-files \
     --clip \
-    --outdir "${DATA}" \
+    --outdir "${FOLDER_DATA}" \
     "${FOLDER_DATA}/raw/${SRA_ID}.sra"
 
 }

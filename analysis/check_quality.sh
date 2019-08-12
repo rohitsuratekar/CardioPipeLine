@@ -34,6 +34,7 @@ fi
 
 file_path="."
 quality_suffix="."
+file_pattern="${SRA_ID}*.fastq"
 unset OPTARG OPTIND
 while getopts ":rf" option; do
   case $option in
@@ -50,6 +51,7 @@ while getopts ":rf" option; do
     fi
     file_path="$FOLDER_FILTERING"
     quality_suffix="_FILTERED"
+    file_pattern="${SRA_ID}${EXTENSION_R_RNA_FILTERED}_*.fastq"
     ;;
   *)
     log "Unknown argument. use '-r' (for raw sequence) or '-f' (for
@@ -83,14 +85,14 @@ output_folder="${FOLDER_QUALITY}/${SRA_ID}/${SRA_ID}${quality_suffix}"
 mkdir -p "$output_folder"
 
 # Check if fastq file exists
-if ! check_file -p "${file_path}" "${SRA_ID}*.fastq"; then
+if ! check_file -p "${file_path}" "${file_pattern}"; then
   log "Unable to find the required FASTQ files. Please check if you have
   given correct argument"
   exit 1
 fi
 
 # Check quality
-find "${file_path}" -maxdepth 1 -type f -name "${SRA_ID}*.fastq" |
+find "${file_path}" -maxdepth 1 -type f -name "${file_pattern}" |
   while read -r filename; do
     check_seq_quality "${filename}" "${output_folder}"
   done
