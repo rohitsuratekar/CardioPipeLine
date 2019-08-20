@@ -23,6 +23,8 @@ source config.sh
 
 convert_to_fastq() {
 
+  log "Starting SRA to FASTQ conversion"
+  
   # Following command is borrowed from  https://edwards.sdsu.edu/research/fastq-dump/
   #
   #--gzip : Compression format (not required here)

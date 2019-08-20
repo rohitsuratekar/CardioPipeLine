@@ -18,6 +18,7 @@
 
 GENOME_FASTA="Danio_rerio.GRCz11.dna.primary_assembly.fa" #Name of the fasta reference file
 GENOME_ANNOTATION="Danio_rerio.GRCz11.96.chr.gtf"         # Genome Annotation file
+GENOME_CDNA="Danio_rerio.GRCz11.cdna.all.fa.gz"           #cDNA Fasta dump
 
 # File extensions
 
@@ -33,3 +34,8 @@ EXTENSION_R_RNA=".rRNA"
 
 # Extension will be added at the end of merged file
 EXTENSION_MERGED_READS="_merged.fastq"
+
+# Salmon files
+
+SALMON_DECOYS="decoys.txt"
+SALMON_HYBRID="gentrome.fa"

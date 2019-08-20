@@ -67,7 +67,6 @@ check_file() {
   # wc -l : count lines coming from find output
 
   n=$(find "$path_given" -maxdepth 1 -type f -name "$file_name" -size "$size" | wc -l)
-
   if [[ "$n" -gt 0 ]]; then
     return 0
   else
