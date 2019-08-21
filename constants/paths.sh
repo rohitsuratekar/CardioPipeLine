@@ -46,3 +46,4 @@ TOOL_STRINGTIE="$TOOL/stringtie-1.3.4d.Linux_x86_64"
 TOOL_TRIMMOMATIC="$TOOL/Trimmomatic-0.39"
 TOOL_SALMON="$TOOL/salmon-latest_linux_x86_64/bin"
 TOOL_MASHMAP="$TOOL/mashmap-Linux64-v2.0"
+

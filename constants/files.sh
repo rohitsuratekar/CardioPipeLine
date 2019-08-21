@@ -19,6 +19,8 @@
 GENOME_FASTA="Danio_rerio.GRCz11.dna.primary_assembly.fa" #Name of the fasta reference file
 GENOME_ANNOTATION="Danio_rerio.GRCz11.96.chr.gtf"         # Genome Annotation file
 GENOME_CDNA="Danio_rerio.GRCz11.cdna.all.fa.gz"           #cDNA Fasta dump
+TRANSCRIPTS_TO_GENE="transcript_to_gene.tsv"              # Trascripts and genes
+TRANSCRIPTS_TO_GO_TERMS="transcript_to_go_terms.tsv"      # Trascripts and go terms
 
 # File extensions
 
