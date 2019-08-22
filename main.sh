@@ -40,7 +40,7 @@ salmon() {
   bash ./analysis/download_files.sh
   bash ./analysis/prepare_files.sh
   bash ./analysis/salmon.sh
-#    bash ./analysis/salmon_post_processing.sh
+  bash ./analysis/salmon_post_processing.sh
 }
 
 arg=0

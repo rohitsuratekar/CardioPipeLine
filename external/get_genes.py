@@ -2,73 +2,69 @@
 #
 # Author : Rohit Suratekar
 # Date : 21 August 2019
+#
+# Ensemble annotation file can be downloaded from the BioMart with following
+# columns
+#
+# Gene stable ID,	Transcript stable ID,	Chromosome/scaffold
+# name,	Gene start (bp),	Gene end (bp),	Strand,	Transcription start site (
+# TSS),	Transcript name,	Gene name,	Source (gene),	Source (
+# transcript),Transcript type,	Transcript length (including UTRs and CDS)	,
+# ZFIN ID
 
-
-import json
 import sys
 
-if len(sys.argv) != 3:
-    raise Exception("Missing arguments from the python script. Please pass ["
-                    "Path of the annotation.gtf] [path of the salmon's "
-                    "quant.sf file]")
-
-GTF_PATH = sys.argv[1]
-INPUT_FILE = sys.argv[2]
+import pandas as pd
 
 
-def extract_attributes(attributes: str):
-    attributes = attributes.strip().split(";")
-    data = {}
-    for a in attributes:
-        temp = a.strip().split("\"")
-        if len(temp) == 3:
-            data[temp[0].strip()] = temp[1].strip()
-
-    return data
-
-
-def get_annotation():
-    with open(GTF_PATH) as f:
-        loc = f.tell()
-        while f.readline().startswith("#"):
-            loc = f.tell()
-        f.seek(loc)
-        all_data = []
-        for line in f:
-            data = line.split("\t")
-            chromosome = data[0]
-            feature = data[2]
-            start = data[3]
-            end = data[4]
-            strand = data[6]
-            attributes = extract_attributes(data[8])
-            temp = [feature, start, end, chromosome, strand, attributes]
-            all_data.append(temp)
-
-        return all_data
+def get_data_frame(input_file: str):
+    """
+    Get data from the file and converts into the pandas DataFrame
+    :param input_file: Full path of the file
+    :return: Pandas DataFrame
+    """
+    with open(input_file) as f:
+        return pd.read_csv(f, delimiter="\t", low_memory=False)
 
 
-def get_data():
-    all_data = []
-    with open(INPUT_FILE) as f:
-        f.readline()  # Skip Header
-        for line in f:
-            all_data.append(line.strip().split("\t"))
+def convert(input_file: str, annotation_file: str, output_file: str):
+    """
+    Main function which takes the Ensemble annotation file (derived from
+    BioMart) and joins it with Salmon output file
+    :param input_file: Salmon output file
+    :param annotation_file: Ensemble annotation file
+    :param output_file: Path of the out file
+    """
 
-    return all_data
+    tra_id = "MainTranscript"
+    ann_tra_id = "Transcript stable ID"
+    ann_gene_id = "Gene stable ID"
+    ann_gene_name = "Gene name"
+    data_name = "Name"
+    data = get_data_frame(input_file)
+    ann = get_data_frame(annotation_file)
+    data[tra_id] = data[data_name].str.split(".").str[0]
+    ann = ann[[ann_gene_id, ann_tra_id, ann_gene_name, "ZFIN ID",
+               "Source (transcript)"]]
+    data = data.merge(ann, left_on=tra_id, right_on=ann_tra_id, how="inner")
+    data = data[~data.duplicated()]
+    del data[tra_id]
+    del data[ann_tra_id]
+
+    with open(output_file, "w") as f:
+        print(data.round(4).to_csv(sep="\t", index=False), file=f)
 
 
-def convert():
-    tra = {}
-    for d in get_annotation():
-        if d[0] == "transcript":
-            tra[d[5]["transcript_id"]] = d
+if __name__ == "__main__":
 
-    for t in get_data():
-        try:
-            k = tra[t[0].split(".")[0]]
-        except KeyError:
-            print(t)
+    if len(sys.argv) != 4:
+        raise Exception(
+            "Missing arguments from the python script. Please pass ["
+            "Path of the transcript_to_gene.tsv] [path of the "
+            "salmon's quant.sf file] [path of output file]")
 
+    ANN_FILE = sys.argv[1]
+    INPUT_FILE = sys.argv[2]
+    OUTPUT_FILE = sys.argv[3]
 
-convert()
+    convert(INPUT_FILE, ANN_FILE, OUTPUT_FILE)

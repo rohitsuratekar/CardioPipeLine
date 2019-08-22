@@ -17,5 +17,19 @@ set -o nounset # Treat unset variables as an error
 
 source config.sh
 
-python3 ./python/get_genes.py "${FOLDER_GENOME}/${GENOME_ANNOTATION}" \
-  "${FOLDER_ANALYSIS}/${SRA_ID}/salmon/quant.sf"
+INPUT_FILE="${FOLDER_ANALYSIS}/${SRA_ID}/salmon/quant.sf"
+OUTPUT_FILE="${FOLDER_ANALYSIS}/${SRA_ID}/salmon/converted_${SRA_ID}.tsv"
+
+run_python() {
+  python3 ./external/get_genes.py "${FOLDER_GENOME}/${TRANSCRIPTS_TO_GENE}" \
+    "$INPUT_FILE" "$OUTPUT_FILE"
+}
+
+log "Starting post-processing on the salmon file"
+
+if run_python ; then
+  log "Processed salmon file $OUTPUT_FILE"
+else
+  log "Could not process the salmon output file"
+  return 1
+fi

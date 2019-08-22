@@ -23,6 +23,8 @@ FOLDER_PIPE="${ORIGIN}/Pipeline"                    # All pipeline scripts
 FOLDER_DATA="${ORIGIN}/Data"                        # All experimental data files
 FOLDER_NCBI_DOWNLOAD=${NCBI_LOCAL}                  # /home/user/ncbi/public/sra
 
+FOLDER_TEMP="${FOLDER_DATA}/temp"                   # Temporary folder to store temp files
+
 # Various analysis related paths
 FOLDER_RAW_DATA="${FOLDER_DATA}/raw"                # Here all downloaded raw data will be stored
 FOLDER_FILTERING="${FOLDER_DATA}/filtering"         # To keep all filtered files
@@ -46,4 +48,3 @@ TOOL_STRINGTIE="$TOOL/stringtie-1.3.4d.Linux_x86_64"
 TOOL_TRIMMOMATIC="$TOOL/Trimmomatic-0.39"
 TOOL_SALMON="$TOOL/salmon-latest_linux_x86_64/bin"
 TOOL_MASHMAP="$TOOL/mashmap-Linux64-v2.0"
-
