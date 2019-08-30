@@ -72,7 +72,7 @@ quantify_reads() {
   # -o : Output folder
   # --validateMapping : enables selective alignment of the sequencing reads
 
-  log "Salmon quantification started"
+  log "Salmon quantification started for $SRA_ID"
 
   "${TOOL_SALMON}/salmon" quant \
     -i "$FOLDER_SALMON_INDEX" \

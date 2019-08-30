@@ -23,7 +23,7 @@ source config.sh
 
 convert_to_fastq() {
 
-  log "Starting SRA to FASTQ conversion"
+  log "Starting SRA to FASTQ conversion for $SRA_ID"
   
   # Following command is borrowed from  https://edwards.sdsu.edu/research/fastq-dump/
   #

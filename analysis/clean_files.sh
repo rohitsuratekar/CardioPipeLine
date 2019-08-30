@@ -18,7 +18,7 @@ set -o nounset # Treat unset variables as an error
 
 source config.sh
 
-log "Deleting unnecessary files from the analysis"
+log "Deleting unnecessary files from the analysis of ${SRA_ID}"
 
 log "Deleting split FASTQ files"
 rm -rf "${FOLDER_DATA}/${SRA_ID}_1.fastq"
@@ -29,3 +29,6 @@ rm -rf "${FOLDER_DATA}/aligned/${SRA_ID}"
 
 log "Deleting filtering data"
 rm -rf "${FOLDER_FILTERING}"
+
+log "Deleting downloaded files"
+rm -rf "${FOLDER_DATA}/raw/${SRA_ID}.sra"

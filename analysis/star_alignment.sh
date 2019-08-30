@@ -27,6 +27,8 @@ star_mapping() {
   # --outSAMtype BAM SortedByCoordinate : Directly makes sorted BAM file so
   # there is no need to use samtools after this
 
+  log "START alignment started for $SRA_ID"
+
   "${TOOL_STAR}"/STAR \
     --runThreadN 8 \
     --genomeDir "$FOLDER_STAR_INDEX" \

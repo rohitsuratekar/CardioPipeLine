@@ -25,9 +25,9 @@ run_python() {
     "$INPUT_FILE" "$OUTPUT_FILE"
 }
 
-log "Starting post-processing on the salmon file"
+log "Starting post-processing on the salmon file of $SRA_ID"
 
-if run_python ; then
+if run_python; then
   log "Processed salmon file $OUTPUT_FILE"
 else
   log "Could not process the salmon output file"

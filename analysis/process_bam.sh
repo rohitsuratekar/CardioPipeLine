@@ -33,6 +33,8 @@ stringtie_analysis() {
   # -o : output path/file name for the assembled transcripts GTF
   # -A : gene abundance estimates (provide output path/file name)
 
+  log "StringTie analysis started for $SRA_ID"
+
   "${TOOL_STRINGTIE}/stringtie" \
     -p 8 \
     -G "${FOLDER_GENOME}/${GENOME_ANNOTATION}" \
