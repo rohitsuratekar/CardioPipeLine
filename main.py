@@ -4,6 +4,6 @@
 #
 # Main configuration for the CardioPipeLine Project
 
-from ncbi.prepare_files import run
+from analysis.star import run
 
 run()

@@ -12,8 +12,10 @@
 
 from local import *
 
+NO_OF_THREADS = 8  # Number of threads used in the computation
 SHOW_LOG = True
 SUCCESS = 0
 
 FOLDER_NCBI_PUBLIC = f"{DEX_HOME}/ncbi/public"
 FOLDER_SRA = f"{DEX_DATA}/sra"
+FOLDER_STAR_INDEX = f"{DEX_WORK}/Genome/index/star"
