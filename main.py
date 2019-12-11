@@ -4,6 +4,6 @@
 #
 # Main configuration for the CardioPipeLine Project
 
-from analysis.star import run
+from analysis.rrna import run
 
 run()

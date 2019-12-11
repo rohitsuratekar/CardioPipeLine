@@ -22,6 +22,8 @@ class PathUtil:
         self.star = f"{TOOL_STAR}/STAR"
         self.genome_fasta = ZEBRAFISH_GENOME_FASTA
         self.gtf_annotation = ZEBRAFISH_GTF_ANNOTATION
+        self.sortmerna = f"{TOOL_SORT_ME_RNA}/sortmerna"
+        self.rrna_db = RRNA_DATABASE
 
     @property
     def sra_db(self):
@@ -36,6 +38,13 @@ class PathUtil:
         :return: full path of STAR index folder
         """
         return f"{DEX_WORK}/Genome/index/star"
+
+    @property
+    def sortmerna_index(self):
+        """
+        :return: full path of sortmerna index folder
+        """
+        return f"{DEX_WORK}/Genome/index/sortmerna"
 
     def sra_meta(self, sra_id: str) -> str:
         """

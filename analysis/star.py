@@ -4,17 +4,42 @@
 #
 # All functions related to STAR will go here
 
+import os
+
 from constants.system import NO_OF_THREADS
 from helpers.logging import Log
 from helpers.resolver import PathUtil
 from helpers.utils import process
 
 
+def check_if_index_exist(pu: PathUtil, log: Log):
+    if pu.exists(pu.star_index):
+        files = os.listdir(pu.star_index)
+        if len(files) > 0:
+            log.info("STAR index folder is non empty and assuming it has "
+                     "index files. If you encounter any problem while using "
+                     "this index, use 'force=True' option to recreate it.")
+            return True
+        else:
+            log.info(f"Default STAR index folder is empty {pu.star_index}")
+            return False
+    else:
+        log.info(f"STAR index does not exist in path {pu.star_index}")
+        return False
+
+
 def generate_index(pu: PathUtil, log: Log, force=False):
-    # Make path for the index
+    # Check if index files already exists
+
+    if check_if_index_exist(pu, log) and not force:
+        log.info("Skipping STAR index generation")
+        return
+
+        # Make path for the index
     pu.make(pu.star_index)
 
     if force:
+        log.info("'Force=True' is provided and hence recreating of STAR index")
         pu.remove_all(pu.star_index)
         log.info("Old STAR index removed")
         pu.make(pu.star_index)
@@ -28,7 +53,7 @@ def generate_index(pu: PathUtil, log: Log, force=False):
         "--genomeDir",  # Folder where index should be made
         pu.star_index,
         "--genomeFastaFiles",  # Fasta file of full genome
-        pu.genome_fasta,  # e.g. Danio_rerio.GRCz11.dna_sm.primary_assembly.fa
+        pu.genome_fasta,  # e.g. Danio_rerio.GRCz11.dna.primary_assembly.fa
         "--sjdbGTFfile",  # GTF Annotation file
         pu.gtf_annotation  # e.g. Danio_rerio.GRCz11.98.chr.gtf
     ]
@@ -37,6 +62,9 @@ def generate_index(pu: PathUtil, log: Log, force=False):
             success=f"STAR indexing successfully performed and stored in "
                     f"{pu.star_index}",
             error="Problem occurred while generating STAR index")
+
+    log.info("STAR generates 'Log.out' as a log file which can be found in "
+             "the root of this script")
 
 
 def generate_alignment(sra_id: str, pu: PathUtil, log: Log):
@@ -86,4 +114,4 @@ def run():
     pu = PathUtil()
     log = Log(show_log=True)
     sra_id = "SRX4720626"
-    generate_alignment(sra_id, pu, log)
+    generate_index(pu, log)
