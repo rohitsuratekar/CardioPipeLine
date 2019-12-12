@@ -21,3 +21,4 @@ SRA_ACCESSION = f"{DEX_DATA}/annotations/SRA_Accessions.tab"
 ZEBRAFISH_GENOME_FASTA = f"{DEX_WORK}/Genome/Danio_rerio.GRCz11.dna.primary_assembly.fa"
 ZEBRAFISH_GTF_ANNOTATION = f"{DEX_WORK}/Genome/Danio_rerio.GRCz11.98.chr.gtf"
 RRNA_DATABASE = f"{DEX_WORK}/Genome/rrna"  # Need for rrna filtering
+ZEBRAFISG_TRANSCRIPT = f"{DEX_WORK}/Genome/Danio_rerio.GRCz11.cdna.all.fa"

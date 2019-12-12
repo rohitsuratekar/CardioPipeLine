@@ -18,3 +18,14 @@ TOOL_STAR = f"{DEX_WORK}/Tools/STAR-2.7.3a/bin/Linux_x86_64"
 TOOL_SRA = f"{DEX_WORK}/Tools/sratoolkit.2.10.0-ubuntu64/bin"
 
 TOOL_SORT_ME_RNA = f"{DEX_WORK}/Tools/sortmerna-4.0.0/bin"
+TOOL_UNMERGE = f"{DEX_WORK}/CardioPipeLine/external/unmerge-paired-reads.sh"
+
+TOOL_SALMON = f"{DEX_WORK}/Tools/salmon-latest_linux_x86_64/bin"
+
+# Script needed to generate Salmon Decoy index
+# https://github.com/COMBINE-lab/SalmonTools/blob/master/scripts/generateDecoyTranscriptome.sh
+TOOL_SALMON_DECOY = f"{DEX_WORK}/CardioPipeLine/external/generateDecoyTranscriptome.sh"
+
+TOOL_MASHMAP = f"{DEX_WORK}/Tools/mashmap-Linux64-v2.0"
+TOOL_BEDTOOLS = f"{DEX_WORK}/Tools/bedtools2/bin"
+TOOL_KALLISTO = f"{DEX_WORK}/Tools/kallisto"

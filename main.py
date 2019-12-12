@@ -4,6 +4,6 @@
 #
 # Main configuration for the CardioPipeLine Project
 
-from analysis.rrna import run
+from analysis.salmon import run
 
 run()

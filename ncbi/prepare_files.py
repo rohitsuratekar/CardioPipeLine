@@ -20,19 +20,20 @@ def move_downloaded(sra_id: str, pu: PathUtil, log: Log):
     for srr in get_meta_runs(sra_id, pu, log):
         opts = [
             "mv",
-            pu.ncbi_srr(srr),
-            pu.srr(sra_id, srr)
+            pu.files.ncbi_srr(srr),
+            pu.files.srr(sra_id, srr)
         ]
         process(opts,
                 log,
-                success=f"{srr}.sra moved to {pu.srr(sra_id, srr)}",
-                error=f"Problem in moving {srr}.sra from {pu.ncbi_srr(srr)}"
+                success=f"{srr}.sra moved to {pu.files.srr(sra_id, srr)}",
+                error=f"Problem in moving {srr}.sra from "
+                      f"{pu.files.ncbi_srr(srr)}"
                 )
 
 
 def fetch_sra(sra_id: str, pu: PathUtil, log: Log):
     opts = [
-        pu.prefetch,
+        pu.tools.prefetch,
         "--verbose",
         sra_id.strip()
     ]
@@ -42,13 +43,13 @@ def fetch_sra(sra_id: str, pu: PathUtil, log: Log):
             success=f"{sra_id} runs are downloaded in {FOLDER_NCBI_PUBLIC}",
             error=f"There was problem downloading {sra_id}")
 
-    log.info(f"Moving downloaded SRA runs to the {pu.sra_db}")
+    log.info(f"Moving downloaded SRA runs to the {pu.files.sra_db}")
     move_downloaded(sra_id, pu, log)
 
 
 def get_meta_runs(sra_id: str, pu: PathUtil, log: Log):
     if pu.sra_meta_exists(sra_id):
-        with open(pu.sra_meta(sra_id)) as f:
+        with open(pu.files.sra_meta(sra_id)) as f:
             return json.load(f)["Runs"]
     else:
         pu.make_sra_path(sra_id)
@@ -85,9 +86,9 @@ def get_meta_runs(sra_id: str, pu: PathUtil, log: Log):
             }
 
         data["Runs"] = all_runs
-        with open(pu.sra_meta(sra_id), 'w', encoding='utf-8') as f:
+        with open(pu.files.sra_meta(sra_id), 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4)
-            log.info(f"SRA run data is saved in {pu.sra_meta(sra_id)}")
+            log.info(f"SRA run data is saved in {pu.files.sra_meta(sra_id)}")
         return srr
 
 
@@ -130,8 +131,8 @@ def convert_to_fastq(sra_id, pu: PathUtil, log: Log, force=False):
         log.info("No fastq files found. Converting SRA to fastq")
         for ssr in get_meta_runs(sra_id, pu, log):
             opts = [
-                pu.fasterq_dump,  # Tool Path,
-                pu.srr(sra_id, ssr),  # Path to input SRA file
+                pu.tools.fasterq_dump,  # Tool Path,
+                pu.files.srr(sra_id, ssr),  # Path to input SRA file
                 "--split-files",  # Splits files according to Reads
                 "--progress",  # Show progress
                 "--skip-technical",  # Skip technical reads
@@ -145,15 +146,15 @@ def convert_to_fastq(sra_id, pu: PathUtil, log: Log, force=False):
                     error=f"Error converting {ssr} into fastq")
 
             all_files = []
-            for f in os.listdir(f"{pu.sra_db}/{sra_id}"):
+            for f in os.listdir(f"{pu.files.sra_db}/{sra_id}"):
                 if f.endswith(".fastq") and f.startswith(ssr):
                     all_files.append(f)
 
-            with open(pu.sra_meta(sra_id)) as f:
+            with open(pu.files.sra_meta(sra_id)) as f:
                 data = json.load(f)
 
             data[ssr]["fastq"] = all_files
-            with open(pu.sra_meta(sra_id), 'w', encoding='utf-8') as f:
+            with open(pu.files.sra_meta(sra_id), 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=4)
 
         return pu.fastq(sra_id)
