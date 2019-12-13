@@ -1,0 +1,33 @@
+{
+  "work": "/home/rsuratekar/Documents/Rohit",
+  "data": "/mnt/data/LocalDB",
+  "index_path": "/home/rsuratekar/Documents/Rohit/Genome/index",
+  "genome": {
+    "fasta": "/home/rsuratekar/Documents/Rohit/Genome/Danio_rerio.GRCz11.dna.primary_assembly.fa",
+    "gtf_annotation": "/home/rsuratekar/Documents/Rohit/Genome/Danio_rerio.GRCz11.98.chr.gtf",
+    "transcript": "/home/rsuratekar/Documents/Rohit/Genome/Danio_rerio.GRCz11.cdna.all.fa",
+    "rrna_database": "/home/rsuratekar/Documents/Rohit/Genome/rrna"
+  },
+  "sra": {
+    "path": "/mnt/data/LocalDB/sra",
+    "accession_db": "/mnt/data/LocalDB/annotations/SRA_Accessions.tab",
+    "ncbi_public": "/home/rsuratekar/ncbi/public"
+  },
+  "tools": {
+    "sratools": "/home/rsuratekar/Documents/Rohit/Tools/sratoolkit.2.10.0-ubuntu64/bin",
+    "star": "/home/rsuratekar/Documents/Rohit/Tools/STAR-2.7.3a/bin/Linux_x86_64",
+    "salmon": "/home/rsuratekar/Documents/Rohit/Tools/salmon-latest_linux_x86_64/bin",
+    "mashmap": "/home/rsuratekar/Documents/Rohit/Tools/mashmap-Linux64-v2.0",
+    "bedtools": "/home/rsuratekar/Documents/Rohit/Tools/bedtools2/bin",
+    "kallisto": "/home/rsuratekar/Documents/Rohit/Tools/kallisto",
+    "sortmerna": "/home/rsuratekar/Documents/Rohit/Tools/sortmerna-4.0.0/bin"
+  },
+  "setup": {
+    "show_log": 1,
+    "save_log": 0,
+    "show_debug_log": 1,
+    "log_file": "cardio.log",
+    "log_format": "%(message)s",
+    "log_format2": "%(asctime)s %(script)s [%(levelname)s] : %(message)s"
+  }
+}
