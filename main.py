@@ -8,6 +8,7 @@ import json
 import sys
 
 from helpers import ConfigParser, MetaParser
+from pipelines import Salmon
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
@@ -18,4 +19,9 @@ if __name__ == "__main__":
         config = ConfigParser(json.load(f))
 
     sra = "SRX4720626"
+
     meta = MetaParser(sra, config.names.sra.folder(sra), config.log)
+
+    # PrepareRNAseq(config, meta).run()
+    # RRNAFiltering(config, meta).run()
+    Salmon(config, meta).run()

@@ -29,7 +29,7 @@ def make_path(path: str):
     os.makedirs(path)
 
 
-def remove_path(path: str):
+def delete_path(path: str):
     """
     Simple context aware tool to remove file or folder
     :param path: Path of the file or folder

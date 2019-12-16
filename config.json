@@ -2,6 +2,7 @@
   "work": "/home/rsuratekar/Documents/Rohit",
   "data": "/mnt/data/LocalDB",
   "index_path": "/home/rsuratekar/Documents/Rohit/Genome/index",
+  "filter_rrna": 0,
   "genome": {
     "fasta": "/home/rsuratekar/Documents/Rohit/Genome/Danio_rerio.GRCz11.dna.primary_assembly.fa",
     "gtf_annotation": "/home/rsuratekar/Documents/Rohit/Genome/Danio_rerio.GRCz11.98.chr.gtf",
@@ -23,6 +24,7 @@
     "sortmerna": "/home/rsuratekar/Documents/Rohit/Tools/sortmerna-4.0.0/bin"
   },
   "setup": {
+    "no_of_threads": 8,
     "show_log": 1,
     "save_log": 0,
     "show_debug_log": 1,

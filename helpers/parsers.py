@@ -7,6 +7,7 @@
 import json
 import logging
 import os
+import subprocess
 
 from helpers.logging import Log
 from helpers.objects import Tool, NameResolver
@@ -68,6 +69,10 @@ class ToolParser:
         if self._salmon is None:
             self._salmon = self._make_tool("salmon", "salmon")
             self._salmon.index = f"{self.index_path}/salmon"
+            self._salmon.add_extra("decoy_index",
+                                   f"{self.index_path}/gentrome.fa")
+            self._salmon.add_extra("decoy_keys",
+                                   f"{self.index_path}/decoys.txt")
         return self._salmon
 
     @property
@@ -95,6 +100,12 @@ class ToolParser:
             self._sortmerna = self._make_tool("sortmerna", "sortmerna")
             self._sortmerna.index = f"{self.index_path}/sortmerna"
             self._sortmerna.output_folder = f"{self._sortmerna.index}/out"
+            self._sortmerna.add_extra("out",
+                                      f"{self._sortmerna.index}/out/other.fastq")
+            self._sortmerna.add_extra("align",
+                                      f"{self._sortmerna.index}/out/aligned.fastq")
+            self._sortmerna.add_extra("log",
+                                      f"{self._sortmerna.index}/out/aligned.log")
         return self._sortmerna
 
 
@@ -106,8 +117,10 @@ class MetaParser:
         self._data = {}  # type: dict
         self._log = log
 
-        self._key_runs = "Runs"
-        self._key_fastq = "fastq"
+        self.key_runs = "Runs"
+        self.key_fastq = "fastq"
+        self.key_filtered = "filtered"
+        self.key_pair_end = "is_pair_end"
         make_path(folder)
         # Check if file exists
         if exists_path(f"{folder}/{self.name}"):
@@ -133,8 +146,8 @@ class MetaParser:
         self.save()
 
     def get_runs(self) -> list:
-        if self._key_runs in self.data.keys():
-            return self.data[self._key_runs]
+        if self.key_runs in self.data.keys():
+            return self.data[self.key_runs]
         else:
             return []
 
@@ -142,7 +155,72 @@ class MetaParser:
         if srr_id not in self.data.keys():
             self._log.error(f"Run '{srr_id}' not found in {self.sra}",
                             exception=FileNotFoundError)
-        return self.data[srr_id][self._key_fastq]
+        return self.data[srr_id][self.key_fastq]
+
+    def get_fastq(self, srr: str) -> list:
+        if srr in self.data.keys():
+            if self.key_fastq in self.data[srr].keys():
+                return self.data[srr][self.key_fastq]
+        return []
+
+    def get_filtered(self, srr: str) -> list:
+        if srr in self.data.keys():
+            if self.key_filtered in self.data[srr].keys():
+                return self.data[srr][self.key_filtered]
+        return []
+
+    def extract_runs(self, accession_path: str):
+        awk_command = f"{{if ($11==\"{self.sra}\") {{print}} }}"
+        opts = [
+            "awk",
+            "-F",
+            " ",
+            awk_command,
+            accession_path
+        ]
+        srr = subprocess.run(opts, stdout=subprocess.PIPE)
+        srr = srr.stdout.decode('utf-8').strip().split("\n")
+
+        if len(srr) == 0:
+            self._log.error(f"No run data found in the database for"
+                            f" {self.sra}. If your SRA id is recently added "
+                            f"to the SRA database, please update the SRA"
+                            f"_Annotation.tab file [{accession_path}] and"
+                            f" try again.")
+
+        if type(srr) == str:
+            srr = [srr]
+        all_runs = []
+        data = {
+            "SRA": self.sra,
+        }
+        for s in srr:
+            current = str(s).strip().split("\t")
+            all_runs.append(current[0])
+            data[current[0]] = {
+                "Submission": current[1],
+                "Status": current[2],
+                "Updated": current[3],
+                "Published": current[4],
+                "Received": current[5],
+                "Type": current[6],
+                "Center": current[7],
+                "Visibility": current[8],
+                "Alias": current[9],
+                "Experiment": current[10],
+                "Sample": current[11],
+                "Study": current[12],
+                "Loaded": current[13],
+                "Spots": current[14],
+                "Bases": current[15],
+                "Md5sum": current[16],
+                "BioSample": current[17],
+                "BioProject": current[18],
+                "ReplacedBy": current[19]
+            }
+
+        data[self.key_runs] = all_runs
+        self.append(data)
 
 
 class ConfigParser:
@@ -183,3 +261,11 @@ class ConfigParser:
         if self._names is None:
             self._names = NameResolver(self.data, self.log)
         return self._names
+
+    @property
+    def no_of_threads(self) -> int:
+        return self.data["setup"]["no_of_threads"]
+
+    @property
+    def rrna_filtering(self) -> bool:
+        return self.data["filter_rrna"] == 1

@@ -19,6 +19,7 @@ class Tool:
         self._output_folder = None
         self._log = log
         self._index = None
+        self._extra = {}
 
         self._log.debug(f"{self.log_header} Tool is initialized")
 
@@ -59,11 +60,23 @@ class Tool:
                        f"{path}")
         return path
 
+    def add_extra(self, key, value):
+        self._extra[key] = value
+
+    def get_extra(self, option_key: str):
+        if option_key in self._extra.keys():
+            return self._extra[option_key]
+        else:
+            self._log.error(f"{self.log_header} Option '{option_key}' doesn't "
+                            f"exist. Please check if such option was "
+                            f"provided at the time of tool initialization.")
+
     def _validate(self, options: list):
         for opt in options:
             if type(opt) != str:
-                self._log.error(f"All the options provided should be String. "
-                                f"Please wrap option '{opt}' in string.")
+                self._log.error(
+                    f"{self.log_header} All the options provided should be "
+                    f"String. Please wrap option '{opt}' in string.")
 
     def run(self, options: list, success: str = None, error: str = None,
             exception=None):
@@ -107,6 +120,15 @@ class SRA:
 
     def meta(self, sra_id: str) -> str:
         return f"{self.folder(sra_id)}/{sra_id}_meta.json"
+
+    def raw_data(self, sra_id: str, srr: str) -> str:
+        return f"{self.folder(sra_id)}/{srr}.sra"
+
+    def filtered_srr(self, sra_id, srr: str, no: int) -> str:
+        return f"{self.folder(sra_id)}/filtered/{srr}_{no}.filtered.fastq"
+
+    def filtered_log(self, sra_id, srr: str) -> str:
+        return f"{self.folder(sra_id)}/filtered/{srr}.filtered.log"
 
 
 class NameResolver:
