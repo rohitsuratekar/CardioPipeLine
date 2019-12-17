@@ -26,10 +26,9 @@
   "setup": {
     "no_of_threads": 8,
     "show_log": 1,
-    "save_log": 0,
+    "save_log": 1,
     "show_debug_log": 1,
     "log_file": "cardio.log",
-    "log_format": "%(message)s",
-    "log_format2": "%(asctime)s %(script)s [%(levelname)s] : %(message)s"
+    "log_format": "%(asctime)s %(script)s [%(levelname)s] : %(message)s"
   }
 }

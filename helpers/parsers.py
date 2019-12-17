@@ -62,6 +62,7 @@ class ToolParser:
         if self._star is None:
             self._star = self._make_tool("star", "STAR")
             self._star.index = f"{self.index_path}/star"
+            self._star.add_extra("bam", "")
         return self._star
 
     @property
@@ -70,9 +71,9 @@ class ToolParser:
             self._salmon = self._make_tool("salmon", "salmon")
             self._salmon.index = f"{self.index_path}/salmon"
             self._salmon.add_extra("decoy_index",
-                                   f"{self.index_path}/gentrome.fa")
+                                   f"{self.salmon.index}/gentrome.fa")
             self._salmon.add_extra("decoy_keys",
-                                   f"{self.index_path}/decoys.txt")
+                                   f"{self.salmon.index}/decoys.txt")
         return self._salmon
 
     @property
@@ -80,6 +81,8 @@ class ToolParser:
         if self._kallisto is None:
             self._kallisto = self._make_tool("kallisto", "kallisto")
             self._kallisto.index = f"{self.index_path}/kallisto"
+            self._kallisto.add_extra("index",
+                                     f"{self._kallisto.index}/kallisto.idx")
         return self._kallisto
 
     @property
@@ -121,6 +124,9 @@ class MetaParser:
         self.key_fastq = "fastq"
         self.key_filtered = "filtered"
         self.key_pair_end = "is_pair_end"
+        self.key_salmon = "salmon"
+        self.key_kallisto = "kallisto"
+        self.key_star = "star"
         make_path(folder)
         # Check if file exists
         if exists_path(f"{folder}/{self.name}"):
@@ -168,6 +174,9 @@ class MetaParser:
             if self.key_filtered in self.data[srr].keys():
                 return self.data[srr][self.key_filtered]
         return []
+
+    def is_paired_end(self, srr: str) -> bool:
+        return self.data[srr][self.key_pair_end] == 1
 
     def extract_runs(self, accession_path: str):
         awk_command = f"{{if ($11==\"{self.sra}\") {{print}} }}"
@@ -229,6 +238,7 @@ class ConfigParser:
         self._tools = None
         self._names = None
         self._log = None
+        self.filtered_id = "filtered"
 
     @property
     def log(self) -> Log:

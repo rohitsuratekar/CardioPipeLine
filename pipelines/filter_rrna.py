@@ -9,7 +9,7 @@ import subprocess
 import sys
 
 from helpers import (ConfigParser, MetaParser,
-                     delete_path, exists_path, move_path)
+                     delete_path, exists_path, move_path, make_path)
 from pipelines._base_pipe import PipeLine
 
 
@@ -22,9 +22,22 @@ class RRNAFiltering(PipeLine):
 
         self.log.info("rRNAFiltering pipeline initialized")
 
+    def _check_if_exists(self, srr):
+        filtered = self.meta.get_filtered(srr)
+        for f in filtered:
+            if not exists_path(f):
+                return False
+        self.log.info(f"Filtered reads for {srr} already exists")
+        return True
+
     def perform_filtering(self):
         self.log.info("Attempting to generate index for SortMeRNA")
-        for ssr in self.meta.get_runs():
+        for srr in self.meta.get_runs():
+
+            if self._check_if_exists(srr):
+                # If filtered files already exists, skip the loop
+                continue
+
             opts = []
             db_path = self.config.names.genome.rrna_db
             for file in os.listdir(db_path):
@@ -34,7 +47,7 @@ class RRNAFiltering(PipeLine):
                         opts.append("-ref")
                         opts.append(f"{db_path}/{file}")
 
-            for file in self.meta.get_fastq(ssr):
+            for file in self.meta.get_fastq(srr):
                 opts.append("-reads")  # For input reads
                 opts.append(file)
 
@@ -64,12 +77,15 @@ class RRNAFiltering(PipeLine):
                                             success="rRNA filtering with "
                                                     "SortMeRNA is successful")
 
-            self.post_processing(ssr)
+            self.post_processing(srr)
 
     def post_processing(self, srr: str):
         out_file = self.config.tools.sortmerna.get_extra("out")
         rna_file = self.config.tools.sortmerna.get_extra("align")
         log_file = self.config.tools.sortmerna.get_extra("log")
+
+        make_path(f"{self.config.names.sra.folder(self.sra_id)}/"
+                  f"{self.config.filtered_id}")
 
         # Sanity check
         if not exists_path(out_file):
@@ -110,7 +126,7 @@ class RRNAFiltering(PipeLine):
         # Add data to the metadata file
 
         data = self.meta.data
-        data[srr]["filtered"] = [
+        data[srr][self.meta.key_filtered] = [
             self.config.names.sra.filtered_srr(self.sra_id, srr, 1),
             self.config.names.sra.filtered_srr(self.sra_id, srr, 2)
         ]

@@ -36,3 +36,12 @@ class PipeLine:
     @meta.setter
     def meta(self, value: MetaParser):
         self._meta = value
+
+    def fasta_for_analysis(self, srr):
+        # Check if filtered sequence is available
+        filtered = self.meta.get_filtered(srr)
+        if len(filtered) > 0:
+            return filtered
+
+        # Else returned unfiltered fasta
+        return self.meta.get_fastq(srr)

@@ -86,12 +86,11 @@ class PrepareRNAseq(PipeLine):
         data[ssr][self.meta.key_pair_end] = len(files) == 2
         self.meta.append(data)
 
-    def check_if_fastq_exists(self) -> bool:
-        for ssr in self.meta.get_runs():
-            fastq = self.meta.get_fastq(ssr)
-            if len(fastq) == 0:
-                self.log.info(f"Fastq files not found for {self.sra}")
-                return False
+    def check_if_fastq_exists(self, ssr) -> bool:
+        fastq = self.meta.get_fastq(ssr)
+        if len(fastq) == 0:
+            self.log.info(f"Fastq files not found for {self.sra}")
+            return False
 
         self.log.info(f"Fastq files collected from "
                       f"{self.config.names.sra.folder(self.sra)}")
@@ -107,13 +106,22 @@ class PrepareRNAseq(PipeLine):
         # Check if meta data exist and if not, create one
         self.check_metadata()
 
-        # Check if fastq file exists
-        if not self.check_if_fastq_exists():
-            # IF no fastq files are there, download them
-            self.check_and_download_raw_data()
-            # and convert them again
-            for ssr in self.meta.get_runs():
-                self.convert_to_fastq(ssr)
+        # Check if filtered files exits and then return
+
+        for srr in self.meta.get_runs():
+
+            filtered = self.meta.get_filtered(srr)
+            filtered = [exists_path(x) for x in filtered]
+            if all(filtered):
+                self.log.info(f"Filtered files exists for {srr}")
+                continue
+
+            # Check if fastq file exists
+            if not self.check_if_fastq_exists(srr):
+                # IF no fastq files are there, download them
+                self.check_and_download_raw_data()
+                # and convert them again
+                self.convert_to_fastq(srr)
 
         self.log.info(f"All fastq files for {self.sra} are prepared for "
                       f"downstream analysis")

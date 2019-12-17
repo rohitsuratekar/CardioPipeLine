@@ -21,6 +21,12 @@ class Salmon(PipeLine):
         self.meta = meta
         self.sra = meta.sra
         self.force_index = force_index
+
+        out_folder = f"{self.config.names.sra.folder(self.sra)}/salmon"
+        self.config.tools.salmon.output_folder = out_folder
+        make_path(out_folder)
+        self.log.info(f"Salmon output folder set to {out_folder}")
+
         self.log.info("Salmon Pipeline Initialized")
 
     def generate_decoy(self):
@@ -109,5 +115,108 @@ class Salmon(PipeLine):
                                      success="Salmon indexing is "
                                              "successfully finished")
 
+    def _check_if_done(self):
+        # Checks if analysis is already done.
+        return exists_path(
+            f"{self.config.tools.salmon.output_folder}/quant.sf")
+
+    def _single_end(self, srr: str, in_opts: list):
+
+        # for the metadata
+        data = self.meta.data
+
+        self.log.info(f"Assuming {srr} is a single end sample")
+        # Make a copy of the options so that it can be used later if needed
+        opts = [x for x in in_opts]
+
+        files = self.fasta_for_analysis(srr)
+
+        # Sanity check
+        if len(files) != 1:
+            self.log.error(f"{srr} has {len(files)} reads. This pipeline "
+                           f"currently only handles single or paired end",
+                           exception=TypeError)
+
+        # Add single end file
+        opts.append("-r")
+        opts.append(files[0])
+
+        data[srr][self.meta.key_salmon] = {
+            "analysis": "Single End",
+            "input": files,
+            "index": self.config.tools.salmon.index,
+            "output": self.config.tools.salmon.output_folder
+        }
+
+        self.log.info("Starting single end Salmon quantification")
+        self.config.tools.salmon.run(opts,
+                                     success=f"Salmon quantification for "
+                                             f"{srr} is successful")
+
+        self.meta.append(data)
+
+    def _paired_end(self, srr: str, in_opts: list):
+
+        # for the metadata
+        data = self.meta.data
+
+        self.log.info(f"Assuming {srr} is a paired end sample")
+        # Make a copy of the options so that it can be used later if needed
+        files = []
+        opts = [x for x in in_opts]
+        for i, f in enumerate(self.fasta_for_analysis(srr)):
+            opts.append(str(-(i + 1)))
+            opts.append(f)
+            files.append(f)
+
+        data[srr][self.meta.key_salmon] = {
+            "analysis": "Paired End",
+            "input": files,
+            "index": self.config.tools.salmon.index,
+            "output": self.config.tools.salmon.output_folder
+        }
+
+        self.log.info("Starting pair end Salmon quantification")
+        self.config.tools.salmon.run(opts,
+                                     success=f"Salmon quantification for "
+                                             f"{srr} is successful")
+
+        self.meta.append(data)
+
+    def quant_salmon(self):
+
+        if self._check_if_done():
+            self.log.info(f"Salmon quantification is already done for sra "
+                          f"{self.sra}")
+            return
+        self.log.info(f"Salmon quantification for {self.sra}")
+
+        opts = [
+            "quant",  # Quant mode
+            "-i",  # Index path
+            self.config.tools.salmon.index,
+            "-l",  # Library type
+            "A",  # Automatic
+            "--validateMapping",
+            # enables selective alignment of the sequencing reads
+            "--gcBias",  # Corrects for  fragment-level GC biases. This option
+            # is also recommended by DESeq2 analysis
+            "-p",  # Number of threads
+            str(self.config.no_of_threads),  # Remove this option if not sure
+            "-g",  # Additional GTF file to get quants.genes.sf
+            self.config.names.genome.gtf,
+            "-o",  # Output path
+            self.config.tools.salmon.output_folder
+        ]
+
+        for srr in self.meta.get_runs():
+            if self.meta.is_paired_end(srr):
+                self._paired_end(srr, opts)
+            else:
+                self._single_end(srr, opts)
+
     def run(self):
         self.index_salmon()
+        self.quant_salmon()
+
+        self.log.info("Exiting Salon pipeline")
