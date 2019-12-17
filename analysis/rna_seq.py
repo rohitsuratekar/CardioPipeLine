@@ -32,6 +32,7 @@ class RNASeq:
             Kallisto(self.config, self.meta).run()
         if self.star:
             Star(self.config, self.meta).run()
+            StringTie(self.config, self.meta).run()
         if self.cleanup:
             CleanUp(self.config, self.meta).run()
         self.config.log.info(f"RNA-seq analysis of {self.sra} finished")

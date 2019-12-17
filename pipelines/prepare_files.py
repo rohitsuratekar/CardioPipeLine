@@ -112,7 +112,7 @@ class PrepareRNAseq(PipeLine):
 
             filtered = self.meta.get_filtered(srr)
             filtered = [exists_path(x) for x in filtered]
-            if all(filtered):
+            if all(filtered) and len(filtered) != 0:
                 self.log.info(f"Filtered files exists for {srr}")
                 continue
 

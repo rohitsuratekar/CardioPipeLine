@@ -26,6 +26,7 @@ class ToolParser:
         self._mashmap = None
         self._bedtools = None
         self._sortmerna = None
+        self._stringtie = None
         self._log = log
 
     def _make_tool(self, key: str, binary: str) -> Tool:
@@ -111,6 +112,12 @@ class ToolParser:
                                       f"{self._sortmerna.index}/out/aligned.log")
         return self._sortmerna
 
+    @property
+    def stringtie(self) -> Tool:
+        if self._stringtie is None:
+            self._stringtie = self._make_tool("stringtie", "stringtie")
+        return self._stringtie
+
 
 class MetaParser:
     def __init__(self, sra: str, folder: str, log: Log):
@@ -127,6 +134,7 @@ class MetaParser:
         self.key_salmon = "salmon"
         self.key_kallisto = "kallisto"
         self.key_star = "star"
+        self.key_string_tie = "stringtie"
         make_path(folder)
         # Check if file exists
         if exists_path(f"{folder}/{self.name}"):

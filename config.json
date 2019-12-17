@@ -2,7 +2,7 @@
   "work": "/home/rsuratekar/Documents/Rohit",
   "data": "/mnt/data/LocalDB",
   "index_path": "/home/rsuratekar/Documents/Rohit/Genome/index",
-  "filter_rrna": 0,
+  "filter_rrna": 1,
   "genome": {
     "fasta": "/home/rsuratekar/Documents/Rohit/Genome/Danio_rerio.GRCz11.dna.primary_assembly.fa",
     "gtf_annotation": "/home/rsuratekar/Documents/Rohit/Genome/Danio_rerio.GRCz11.98.chr.gtf",
@@ -21,7 +21,8 @@
     "mashmap": "/home/rsuratekar/Documents/Rohit/Tools/mashmap-Linux64-v2.0",
     "bedtools": "/home/rsuratekar/Documents/Rohit/Tools/bedtools2/bin",
     "kallisto": "/home/rsuratekar/Documents/Rohit/Tools/kallisto",
-    "sortmerna": "/home/rsuratekar/Documents/Rohit/Tools/sortmerna-4.0.0/bin"
+    "sortmerna": "/home/rsuratekar/Documents/Rohit/Tools/sortmerna-4.0.0/bin",
+    "stringtie": "/home/rsuratekar/Documents/Rohit/Tools/stringtie-2.0.6.Linux_x86_64"
   },
   "setup": {
     "no_of_threads": 8,

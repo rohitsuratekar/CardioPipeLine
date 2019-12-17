@@ -18,6 +18,8 @@ if __name__ == "__main__":
     with open(sys.argv[1]) as f:
         config = ConfigParser(json.load(f))
 
-    sra = "SRX4720625"
+    all_ids = ["SRX4720625", "SRX4720626",
+               "SRX4720628", "SRX4720629"]
 
-    RNASeq(sra, config).run()
+    for sra in all_ids:
+        RNASeq(sra, config).run()
