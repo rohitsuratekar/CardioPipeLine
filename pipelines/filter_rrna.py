@@ -6,7 +6,6 @@
 
 import os
 import subprocess
-import sys
 
 from helpers import (ConfigParser, MetaParser,
                      delete_path, exists_path, move_path, make_path)
@@ -24,6 +23,8 @@ class RRNAFiltering(PipeLine):
 
     def _check_if_exists(self, srr):
         filtered = self.meta.get_filtered(srr)
+        if len(filtered) == 0:
+            return False
         for f in filtered:
             if not exists_path(f):
                 return False
@@ -50,6 +51,14 @@ class RRNAFiltering(PipeLine):
             for file in self.meta.get_fastq(srr):
                 opts.append("-reads")  # For input reads
                 opts.append(file)
+
+            if len(self.meta.get_fastq(srr)) == 0:
+                self.log.error(f"No fastq file found for {srr} while rRNA "
+                               f"filtering. Your {srr}_metadata.json should "
+                               f"have fastq entries. If you have used "
+                               f"pipeline skipping previous steps. "
+                               f"Check the metadata file and add entries "
+                               f"manually")
 
             # Add other options if "-paired_in" is used, both reads will be
             # merged, hence don't use it
@@ -92,8 +101,7 @@ class RRNAFiltering(PipeLine):
             self.log.error(
                 f"Output file for SortMeRNA are not found at {out_file}")
 
-        base_folder = os.path.dirname(sys.argv[0])
-        unmerg_script = f"{base_folder}/external/unmerge-paired-reads.sh"
+        unmerg_script = "external/unmerge-paired-reads.sh"
 
         # Check if binary has proper access to execute the command
         if not os.access(unmerg_script, os.X_OK):
@@ -108,7 +116,7 @@ class RRNAFiltering(PipeLine):
             self.config.names.sra.filtered_srr(self.sra_id, srr, 2)
         ]
 
-        if subprocess.run(opts).returncode == 0:
+        if subprocess.run(opts, shell=True).returncode == 0:
             self.log.info("Filtered files successfully un-merged")
         else:
             self.log.error("Something went wrong in un-merging filtered files")

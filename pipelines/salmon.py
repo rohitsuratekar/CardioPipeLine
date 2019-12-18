@@ -6,7 +6,6 @@
 
 import os
 import subprocess
-import sys
 
 from helpers import ConfigParser, MetaParser, make_path, exists_path
 from pipelines._base_pipe import PipeLine
@@ -34,8 +33,7 @@ class Salmon(PipeLine):
         index_folder = self.config.tools.salmon.index
         make_path(index_folder)  # Sanity check
 
-        base_folder = os.path.dirname(sys.argv[0])
-        decoy_script = f"{base_folder}/external/generateDecoyTranscriptome.sh"
+        decoy_script = "external/generateDecoyTranscriptome.sh"
 
         # Check if binary has proper access to execute the command
         if not os.access(decoy_script, os.X_OK):
@@ -62,7 +60,7 @@ class Salmon(PipeLine):
             self.config.tools.mashmap.path
         ]
 
-        if subprocess.run(opts).returncode == 0:
+        if subprocess.run(opts, shell=True).returncode == 0:
             self.log.info(
                 f"Salmon Decoy file generated successfully in {index_folder}")
         else:
