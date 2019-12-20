@@ -55,23 +55,28 @@ class PrepareRNAseq(PipeLine):
                       f"{self.config.names.sra.folder(self.sra)}")
         return True
 
-    def convert_to_fastq(self, ssr: str):
-        opts = [
-            self.config.names.sra.raw_data(self.sra, ssr),  # Path to
-            # input SRA file
-            "--split-files",  # Splits files according to Reads
-            "--progress",  # Show progress
-            "--skip-technical",  # Skip technical reads
-            "--threads",  # Number of threads
-            str(self.config.no_of_threads),
-            # If you are unsure, use 6 (default)
-            "--outdir",  # Output folder
-            self.config.names.sra.folder(self.sra)
-        ]
+    def convert_to_fastq(self, srr: str):
 
-        self.config.tools.fasterq_dump.run(opts,
-                                           success=f"{ssr} is converted "
-                                                   f"into the fastq files")
+        # Check if fastq file already exists
+        fastq_file = f"{self.config.names.sra.raw_data(self.sra, srr)}.fastq"
+        if not exists_path(fastq_file):
+            # Perform fastq conversion only if file does not exist
+            opts = [
+                self.config.names.sra.raw_data(self.sra, srr),  # Path to
+                # input SRA file
+                "--split-files",  # Splits files according to Reads
+                "--progress",  # Show progress
+                "--skip-technical",  # Skip technical reads
+                "--threads",  # Number of threads
+                str(self.config.no_of_threads),
+                # If you are unsure, use 6 (default)
+                "--outdir",  # Output folder
+                self.config.names.sra.folder(self.sra)
+            ]
+
+            self.config.tools.fasterq_dump.run(opts,
+                                               success=f"{srr} is converted "
+                                                       f"into the fastq files")
 
         # Add converted fastq files to the metadata
         files = []
@@ -79,11 +84,11 @@ class PrepareRNAseq(PipeLine):
         for file in os.listdir(folder):
             if os.path.isfile(f"{folder}/{file}"):
                 if str(file).endswith(".fastq") and str(
-                        file).startswith(ssr):
+                        file).startswith(srr):
                     files.append(f"{folder}/{file}")
         data = self.meta.data
-        data[ssr][self.meta.key_fastq] = sorted(files)
-        data[ssr][self.meta.key_pair_end] = len(files) == 2
+        data[srr][self.meta.key_fastq] = sorted(files)
+        data[srr][self.meta.key_pair_end] = len(files) == 2
         self.meta.append(data)
 
     def check_if_fastq_exists(self, ssr) -> bool:

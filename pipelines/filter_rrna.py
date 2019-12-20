@@ -88,19 +88,8 @@ class RRNAFiltering(PipeLine):
 
             self.post_processing(srr)
 
-    def post_processing(self, srr: str):
-        out_file = self.config.tools.sortmerna.get_extra("out")
-        rna_file = self.config.tools.sortmerna.get_extra("align")
-        log_file = self.config.tools.sortmerna.get_extra("log")
-
-        make_path(f"{self.config.names.sra.folder(self.sra_id)}/"
-                  f"{self.config.filtered_id}")
-
-        # Sanity check
-        if not exists_path(out_file):
-            self.log.error(
-                f"Output file for SortMeRNA are not found at {out_file}")
-
+    def _paired_end(self, srr: str, out_file: str):
+        self.log.info(f"{srr} is paired end, hence splitting filtered file")
         unmerg_script = "external/unmerge-paired-reads.sh"
 
         # Check if binary has proper access to execute the command
@@ -116,20 +105,10 @@ class RRNAFiltering(PipeLine):
             self.config.names.sra.filtered_srr(self.sra_id, srr, 2)
         ]
 
-        if subprocess.run(opts, shell=True).returncode == 0:
+        if subprocess.run(opts).returncode == 0:
             self.log.info("Filtered files successfully un-merged")
         else:
             self.log.error("Something went wrong in un-merging filtered files")
-
-        # Move log file to filtered folder
-        move_path(log_file, self.config.names.sra.filtered_log(self.sra_id,
-                                                               srr))
-
-        # Delete filtered files
-        delete_path(rna_file)
-        delete_path(out_file)
-
-        self.log.info(f"rRNA filtering post processing done for {srr}")
 
         # Add data to the metadata file
 
@@ -139,6 +118,47 @@ class RRNAFiltering(PipeLine):
             self.config.names.sra.filtered_srr(self.sra_id, srr, 2)
         ]
         self.meta.append(data)
+
+    def _single_end(self, srr: str, out_file: str):
+        self.log.info(f"{srr} is single end, hence just moving the file")
+
+        # Move log file to filtered folder
+        move_path(out_file,
+                  self.config.names.sra.filtered_srr(self.sra_id, srr, 1))
+
+        data = self.meta.data
+        data[srr][self.meta.key_filtered] = [
+            self.config.names.sra.filtered_srr(self.sra_id, srr, 1),
+        ]
+        self.meta.append(data)
+
+    def post_processing(self, srr: str):
+        out_file = self.config.tools.sortmerna.get_extra("out")
+        rna_file = self.config.tools.sortmerna.get_extra("align")
+        log_file = self.config.tools.sortmerna.get_extra("log")
+
+        make_path(f"{self.config.names.sra.folder(self.sra_id)}/"
+                  f"{self.config.filtered_id}")
+
+        # Sanity check
+        if not exists_path(out_file):
+            self.log.error(
+                f"Output file for SortMeRNA are not found at {out_file}")
+
+        # Check if paired end or single end
+        if self.meta.is_paired_end(srr):
+            self._paired_end(srr, out_file)
+        else:
+            self._single_end(srr, out_file)
+
+        # Move log file to filtered folder
+        move_path(log_file, self.config.names.sra.filtered_log(self.sra_id,
+                                                               srr))
+        # Delete filtered files
+        delete_path(rna_file)
+        delete_path(out_file)
+
+        self.log.info(f"rRNA filtering post processing done for {srr}")
 
     def run(self):
         if not self.config.rrna_filtering:
