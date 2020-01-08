@@ -141,9 +141,9 @@ class Salmon(PipeLine):
 
         data[srr][self.meta.key_salmon] = {
             "analysis": "Single End",
-            "input": files,
+            self.meta.key_input: files,
             "index": self.config.tools.salmon.index,
-            "output": self.config.tools.salmon.output_folder
+            self.meta.key_output: self.config.tools.salmon.output_folder
         }
 
         self.log.info("Starting single end Salmon quantification")
@@ -169,9 +169,9 @@ class Salmon(PipeLine):
 
         data[srr][self.meta.key_salmon] = {
             "analysis": "Paired End",
-            "input": files,
+            self.meta.key_input: files,
             "index": self.config.tools.salmon.index,
-            "output": self.config.tools.salmon.output_folder
+            self.meta.key_output: self.config.tools.salmon.output_folder
         }
 
         self.log.info("Starting pair end Salmon quantification")

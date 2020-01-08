@@ -46,10 +46,20 @@ class Kallisto(PipeLine):
 
     def _single_end(self, srr: str, in_opts: list):
         opts = [x for x in in_opts]
+
+        # Get fragment length and standard deviation from config file NOTE:
+        # These parameter are important for single end. See discussion here
+        # : https://www.biostars.org/p/253943/ or documentation note here :
+        # https://pachterlab.github.io/kallisto/manual
+
+        frg_length, frg_sd = self.config.kallisto_parameters
+
         opts.extend([
             "--single",  # Single end sequencing
             "-l",  # Fragment length
-            str(200)  # TODO: Handle this through config file
+            str(frg_length),  # BE Careful about this parameter
+            "-s",  # Fragment standard deviation
+            str(frg_sd)
         ])
 
         files = self.fasta_for_analysis(srr)

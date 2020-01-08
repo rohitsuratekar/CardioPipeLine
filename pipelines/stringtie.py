@@ -58,8 +58,8 @@ class StringTie(PipeLine):
 
         data = self.meta.data
         data[srr][self.meta.key_string_tie] = {
-            "input": bam_file,
-            "output": output_file
+            self.meta.key_input: bam_file,
+            self.meta.key_output: output_file
         }
         self.meta.append(data)
 

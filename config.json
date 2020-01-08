@@ -24,6 +24,10 @@
     "sortmerna": "/home/rsuratekar/Documents/Rohit/Tools/sortmerna-4.0.0/bin",
     "stringtie": "/home/rsuratekar/Documents/Rohit/Tools/stringtie-2.0.6.Linux_x86_64"
   },
+  "extra": {
+    "kallisto-fragment-length": 200,
+    "kallisto-standard-deviation": 20
+  },
   "setup": {
     "no_of_threads": 8,
     "show_log": 1,

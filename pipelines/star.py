@@ -105,9 +105,9 @@ class Star(PipeLine):
 
         data[srr][self.meta.key_star] = {
             "analysis": analysis_type,
-            "input": files,
+            self.meta.key_input: files,
             "index": self.config.tools.star.index,
-            "output": self.config.tools.star.output_folder
+            self.meta.key_output: self.config.tools.star.output_folder
         }
 
         self.meta.append(data)

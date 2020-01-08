@@ -135,6 +135,9 @@ class MetaParser:
         self.key_kallisto = "kallisto"
         self.key_star = "star"
         self.key_string_tie = "stringtie"
+        self.key_deseq2 = "deseq2"
+        self.key_input = "input"
+        self.key_output = "output"
         make_path(folder)
         # Check if file exists
         if exists_path(f"{folder}/{self.name}"):
@@ -287,3 +290,8 @@ class ConfigParser:
     @property
     def rrna_filtering(self) -> bool:
         return self.data["filter_rrna"] == 1
+
+    @property
+    def kallisto_parameters(self) -> tuple:
+        return self.data["extra"]["kallisto-fragment-length"], self.data[
+            "extra"]["kallisto-standard-deviation"]

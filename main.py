@@ -11,7 +11,8 @@ import json
 import sys
 
 from analysis.rna_seq import RNASeq
-from helpers import ConfigParser
+from pipelines.deseq2 import DESeq2
+from helpers import ConfigParser, MetaParser
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
@@ -32,4 +33,12 @@ if __name__ == "__main__":
         config.log.info(f"Analysis will start for {all_ids[0]}")
 
     for sra in all_ids:
-        RNASeq(sra, config).run()
+        # To avoid any spaces to go in the analysis and cause error
+        # if len(sra.strip()) > 0:
+        #     RNASeq(sra, config).run()
+        meta = MetaParser(
+            sra,
+            config.names.sra.folder(sra),
+            config.log)
+        DESeq2(config, meta, "salmon").run()
+        break
