@@ -4,6 +4,7 @@
 #
 # Differential analysis with DESeq2
 
+import subprocess
 from typing import List
 
 from helpers import ConfigParser, MetaParser
@@ -15,8 +16,12 @@ class DESeq2:
         self.config = config
         self.samples = []
         self._conditions = {}
-
+        self.design = None
+        self.deseq_test = "Wald"
+        self.reduced_design = "~ 1"
+        self.contrast = None
         self.method = method.strip().lower()
+        self.alpha = 0.1
 
         self.salmon = False
         self.star = False
@@ -32,6 +37,11 @@ class DESeq2:
 
     def add_condition(self, name: str, condition_list: List[str]):
         self._conditions[name] = condition_list
+
+    def add_design(self, design: str):
+        if len(design.strip()) == 0:
+            self.log.error("Design can not be empty string")
+        self.design = design
 
     def _assign_method(self):
         if self.method == "star":
@@ -89,6 +99,43 @@ class DESeq2:
                 self.log.error("Number of 'condition-details' should be same "
                                "as number of samples.")
 
+        if self.design is None:
+            self.log.error("No design formula is provided. Please add design "
+                           "formula for the DESeq2 analysis.")
+
+    def _perform_analysis(self):
+        opts = [
+            "Rscript",
+            "rscripts/deseq2.R",
+            "-c",
+            f"{self.config.deseq2_final_output}/{self.method}.counts.csv",
+            "-m",
+            f"{self.config.deseq2_final_output}/{self.method}.meta.csv",
+            "-d",
+            self.design,
+            "-t",
+            self.deseq_test,
+            "-r",
+            self.reduced_design,
+            "-o",
+            f"{self.config.deseq2_final_output}/{self.method}"
+        ]
+
+        if self.contrast is not None:
+            if len(self.contrast) != 3:
+                self.log.error("Contrast should contain exactly 3 string "
+                               "elements")
+            opts.extend([
+                "-n",
+                "\t".join(self.contrast),
+                "-a",
+                str(self.alpha)
+            ])
+
+        if subprocess.run(opts).returncode != 0:
+            self.log.error("Something went wrong in performing DESeq2 "
+                           "analysis")
+
     def run(self):
         self.config.log.info(f"DESeq2 analysis started")
 
@@ -101,5 +148,8 @@ class DESeq2:
 
         # Generate merged count matrix and meta files
         self._generate_meta_files()
+
+        # Perform the analysis
+        self._perform_analysis()
 
         self.config.log.info(f"DESeq2 analysis finished")

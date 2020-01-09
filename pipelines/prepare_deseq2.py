@@ -212,7 +212,8 @@ class DESeqMeta(PipeLine):
         dfs = [x.set_index(CM_GENE_ID) for x in dfs]
         dfs = pd.concat(dfs, axis=1, join="outer", sort=False)
         dfs = dfs.sort_index().reset_index()
-        count_file = f"{self.config.deseq2_final_output}/counts.{self.method}.csv"
+        count_file = f"{self.config.deseq2_final_output}/" \
+                     f"{self.method}.counts.csv"
         dfs.to_csv(count_file, index=False)
         self.log.info(f"Final count file saved in {count_file}")
         return count_file
@@ -233,8 +234,8 @@ class DESeqMeta(PipeLine):
                 self.log.error("Number of 'condition-details' should be same "
                                "as number of samples.")
 
-    def _create_meta_file(self) -> str:
-        data = [self._samples]
+    def _create_meta_file(self, runs) -> str:
+        data = [runs]
         col_names = ["samples"]
         for condition in self._conditions:
             col_names.append(condition)
@@ -245,7 +246,7 @@ class DESeqMeta(PipeLine):
             df_data[c] = d
 
         df = pd.DataFrame(df_data)
-        meta_file = f"{self.config.deseq2_final_output}/meta.{self.method}.csv"
+        meta_file = f"{self.config.deseq2_final_output}/{self.method}.meta.csv"
         df.to_csv(meta_file, index=False)
         self.log.info(f"Meta file saved in {meta_file}")
         return meta_file
@@ -271,6 +272,6 @@ class DESeqMeta(PipeLine):
         self._combine_files(file_list)
 
         # Create meta file
-        self._create_meta_file()
+        self._create_meta_file(rns)
 
         self.log.info("Exiting DESeqMeta pipeline.")

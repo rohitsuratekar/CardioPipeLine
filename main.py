@@ -50,12 +50,15 @@ def public_rnaseq_example(ids: list):
 
 def public_deseq2_example(method: str):
     # List of SRA ids for DESeq2 analysis
-    sample_list = ["SRX4720625", "SRX4720626"]
+    sample_list = ["SRX4720628", "SRX4720629", "SRX4720625", "SRX4720626"]
 
     # Their conditions
     # In this example, I am using samples taken at different time
     # developmental time points as a condition
-    conditions = ["24hpf", "24hpf"]
+    # Here we are using 24hpf as a control or starting point. And by
+    # convention in DESeq2 program, control is provided at the end.
+    condition = "time"
+    condition_details = ["48hpf", "48hpf", "24hpf", "24hpf"]
 
     # Generate DESeq2 object with desired method
     # Currently 4 methods are available [star, salmon, kallisto, stringtie]
@@ -66,10 +69,19 @@ def public_deseq2_example(method: str):
 
     # Add conditions
     # Give name which you can use in statistical modelling of DESeq2 tool
-    deq.add_condition("time", conditions)
-
+    deq.add_condition(condition, condition_details)
     # You can add extra conditions like cell type, genotype extra if you
     # like. These all conditions will be available in the meta file
+
+    # We will just do simple differential analysis based on developmental time
+    design = f"~ {condition}"  # e.g "~ time"
+    deq.add_design(design)
+
+    # We can provide contrast matrix for LFC shrinkage.
+    # If not given, LFC Shrinkage will not be performed
+    deq.contrast = [condition, "48hpf", "24hpf"]
+    deq.alpha = 0.05  # Alpha usually decided p-value threshold of FDR. This
+    # will affect the adjusted-p-value in the final result
 
     # Run the analysis
     deq.run()
