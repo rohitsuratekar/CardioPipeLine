@@ -136,6 +136,9 @@ class DESeq2:
             self.log.error("Something went wrong in performing DESeq2 "
                            "analysis")
 
+        self.log.info(f"Successful DESeq2 analysis. All the results are "
+                      f"stored in {self.config.deseq2_final_output}")
+
     def run(self):
         self.config.log.info(f"DESeq2 analysis started")
 
