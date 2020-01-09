@@ -138,6 +138,7 @@ class MetaParser:
         self.key_deseq2 = "deseq2"
         self.key_input = "input"
         self.key_output = "output"
+        self.key_counts = "counts"
         make_path(folder)
         # Check if file exists
         if exists_path(f"{folder}/{self.name}"):
@@ -295,3 +296,7 @@ class ConfigParser:
     def kallisto_parameters(self) -> tuple:
         return self.data["extra"]["kallisto-fragment-length"], self.data[
             "extra"]["kallisto-standard-deviation"]
+
+    @property
+    def deseq2_final_output(self) -> str:
+        return self.data["extra"]["deseq2_output_folder"]

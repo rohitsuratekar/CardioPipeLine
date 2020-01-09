@@ -26,7 +26,8 @@
   },
   "extra": {
     "kallisto-fragment-length": 200,
-    "kallisto-standard-deviation": 20
+    "kallisto-standard-deviation": 20,
+    "deseq2_output_folder": "/home/rsuratekar/Documents/Rohit/Analysis"
   },
   "setup": {
     "no_of_threads": 8,
