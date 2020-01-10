@@ -10,4 +10,3 @@ from pipelines.salmon import Salmon
 from pipelines.star import Star
 from pipelines.cleanup import CleanUp
 from pipelines.stringtie import StringTie
-from pipelines.prepare_deseq2 import CountMatrix, DESeqMeta

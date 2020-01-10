@@ -4,11 +4,13 @@
 #
 # Differential analysis with DESeq2
 
+import json
 import subprocess
 from typing import List
 
-from helpers import ConfigParser, MetaParser
-from pipelines import CountMatrix, DESeqMeta
+import pandas as pd
+
+from helpers import ConfigParser, MetaParser, exists_path, make_path
 
 
 class DESeq2:
@@ -17,20 +19,11 @@ class DESeq2:
         self.samples = []
         self._conditions = {}
         self.design = None
-        self.deseq_test = "Wald"
-        self.reduced_design = "~ 1"
         self.contrast = None
         self.method = method.strip().lower()
         self.alpha = 0.1
 
-        self.salmon = False
-        self.star = False
-        self.kallisto = False
-        self.stringtie = False
-
         self.log = config.log
-
-        self._assign_method()
 
     def add_samples(self, sample_list: List[str]):
         self.samples = sample_list
@@ -42,46 +35,6 @@ class DESeq2:
         if len(design.strip()) == 0:
             self.log.error("Design can not be empty string")
         self.design = design
-
-    def _assign_method(self):
-        if self.method == "star":
-            self.star = True
-        elif self.method == "salmon":
-            self.salmon = True
-        elif self.method == "kallisto":
-            self.kallisto = True
-        elif self.method == "stringtie":
-            self.stringtie = True
-        else:
-            self.config.log.error(f"Method {self.method} is not supported in "
-                                  f"the DESeq2 pipeline yet. Available "
-                                  f"options are [star, salmon, kallisto, "
-                                  f"stringtie]")
-
-    def _generate_count_matrix(self, sra):
-
-        meta = MetaParser(
-            sra,
-            self.config.names.sra.folder(sra),
-            self.config.log)
-
-        if self.salmon:
-            CountMatrix(self.config, meta, "salmon").run()
-        if self.kallisto:
-            CountMatrix(self.config, meta, "kallisto").run()
-        if self.star:
-            CountMatrix(self.config, meta, "star").run()
-        if self.stringtie:
-            CountMatrix(self.config, meta, "stringtie").run()
-
-    def _generate_meta_files(self):
-        deq = DESeqMeta(self.config, self.method)
-        deq.samples(self.samples)
-
-        for condition in self._conditions:
-            deq.add_conditions(condition, self._conditions[condition])
-
-        deq.run()
 
     def _check_setup(self):
         samples = len(self.samples)
@@ -103,56 +56,110 @@ class DESeq2:
             self.log.error("No design formula is provided. Please add design "
                            "formula for the DESeq2 analysis.")
 
+        # Create analysis folder if not exists
+        make_path(self.config.deseq2_final_output)
+
+    def _get_run_input(self, srr: str, meta: MetaParser):
+        try:
+            data = meta.data[srr]
+            f = ""
+            if self.method == "salmon":
+                f = f"{data[meta.key_salmon][meta.key_output]}/quant.sf"
+            elif self.method == "kallisto":
+                f = f"{data[meta.key_kallisto][meta.key_output]}/abundance.tsv"
+            elif self.method == "stringtie":
+                f = f"{self.config.names.sra.folder(meta.sra)}" \
+                    f"/{meta.key_string_tie}/t_data.ctab"
+            elif self.method == "star":
+                f = f"{data[meta.key_string_tie][meta.key_input]}"
+            else:
+                self.log.error(f"Method {self.method} is not supported for "
+                               f"DESeq2 analysis yet.")
+
+            if not exists_path(f):
+                self.log.error(f"Input file not found : {f}")
+
+            return f
+        except KeyError:
+            self.log.error(f"Input needed for DESeq2 analysis using "
+                           f"{self.method} not found.")
+
+    def _generate_config_file(self) -> str:
+        files = {}
+        all_runs = []
+        run_types = []
+        for sample in self.samples:
+            files[sample] = {}
+            meta = MetaParser(sample,
+                              self.config.names.sra.folder(sample),
+                              self.log)
+
+            for rns in meta.get_runs():
+                all_runs.append(rns)
+                files[sample][rns] = self._get_run_input(rns, meta)
+                run_types.append(int(meta.is_paired_end(rns)))
+
+        mf = self._generate_meta_file(all_runs)
+
+        # Following meta data is passed to the R scripts for the downstream
+        # analysis
+
+        data = {
+            "input": files,
+            "output": self.config.deseq2_final_output,
+            "samples": self.samples,
+            "paired": run_types,
+            "conditions": self._conditions,
+            "design": self.design,
+            "method": self.method,
+            "gtf": self.config.names.genome.gtf,
+            "meta": mf,
+            "contrast": self.contrast,
+            "alpha": self.alpha,
+            "threads": self.config.no_of_threads
+        }
+        jf = f"{self.config.deseq2_final_output}/{self.method}.config.json"
+        with open(jf, "w", encoding='utf-8') as f:
+            json.dump(data, f, indent=4)
+
+        return jf
+
+    def _generate_meta_file(self, runs) -> str:
+        data = [runs]
+        col_names = ["samples"]
+        for condition in self._conditions:
+            col_names.append(condition)
+            data.append(self._conditions[condition])
+
+        df_data = {}
+        for c, d in zip(col_names, data):
+            df_data[c] = d
+
+        df = pd.DataFrame(df_data)
+        meta_file = f"{self.config.deseq2_final_output}/{self.method}.meta.csv"
+        df.to_csv(meta_file, index=False)
+        self.log.info(f"Meta file saved in {meta_file}")
+        return meta_file
+
     def _perform_analysis(self):
+        f = self._generate_config_file()
         opts = [
             "Rscript",
-            "rscripts/deseq2.R",
+            "rscripts/combined.R",
             "-c",
-            f"{self.config.deseq2_final_output}/{self.method}.counts.csv",
-            "-m",
-            f"{self.config.deseq2_final_output}/{self.method}.meta.csv",
-            "-d",
-            self.design,
-            "-t",
-            self.deseq_test,
-            "-r",
-            self.reduced_design,
-            "-o",
-            f"{self.config.deseq2_final_output}/{self.method}"
+            f
         ]
 
-        if self.contrast is not None:
-            if len(self.contrast) != 3:
-                self.log.error("Contrast should contain exactly 3 string "
-                               "elements")
-            opts.extend([
-                "-n",
-                "\t".join(self.contrast),
-                "-a",
-                str(self.alpha)
-            ])
-
         if subprocess.run(opts).returncode != 0:
-            self.log.error("Something went wrong in performing DESeq2 "
-                           "analysis")
-
-        self.log.info(f"Successful DESeq2 analysis. All the results are "
-                      f"stored in {self.config.deseq2_final_output}")
+            self.log.error("Something went wrong in running DESeq2 analysis")
 
     def run(self):
-        self.config.log.info(f"DESeq2 analysis started")
+        self.config.log.info(f"DESeq2 analysis with {self.method} started")
 
         # Check setup
         self._check_setup()
 
-        # Generate individual count matrix
-        for sra in self.samples:
-            self._generate_count_matrix(sra)
-
-        # Generate merged count matrix and meta files
-        self._generate_meta_files()
-
-        # Perform the analysis
+        # analyse
         self._perform_analysis()
 
-        self.config.log.info(f"DESeq2 analysis finished")
+        self.config.log.info(f"DESeq2 analysis with {self.method} finished")

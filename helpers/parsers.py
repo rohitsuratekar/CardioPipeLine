@@ -135,10 +135,8 @@ class MetaParser:
         self.key_kallisto = "kallisto"
         self.key_star = "star"
         self.key_string_tie = "stringtie"
-        self.key_deseq2 = "deseq2"
         self.key_input = "input"
         self.key_output = "output"
-        self.key_counts = "counts"
         make_path(folder)
         # Check if file exists
         if exists_path(f"{folder}/{self.name}"):

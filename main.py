@@ -48,7 +48,7 @@ def public_rnaseq_example(ids: list):
             seq.run()
 
 
-def public_deseq2_example(method: str):
+def public_deseq2_example(mtd: str):
     # List of SRA ids for DESeq2 analysis
     sample_list = ["SRX4720628", "SRX4720629", "SRX4720625", "SRX4720626"]
 
@@ -62,7 +62,7 @@ def public_deseq2_example(method: str):
 
     # Generate DESeq2 object with desired method
     # Currently 4 methods are available [star, salmon, kallisto, stringtie]
-    deq = DESeq2(config, method)
+    deq = DESeq2(config, mtd)
 
     # Add samples
     deq.add_samples(sample_list)
@@ -105,5 +105,6 @@ if __name__ == "__main__":
         all_ids.append(str(sys.argv[2]).strip().upper())
         config.log.info(f"Analysis will start for {all_ids[0]}")
 
-    # DESeq2 example
-    public_deseq2_example("star")
+    # DESeq2 example with all 4 methods
+    for method in ["star", "salmon", "kallisto", "stringtie"]:
+        public_deseq2_example(method)
