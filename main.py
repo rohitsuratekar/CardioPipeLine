@@ -7,11 +7,14 @@
 # Important Note: Make sure that external/generateDecoyTranscriptome.sh and
 # external/unmerge-paired-reads.sh has execute access.
 
+import itertools
 import json
+import subprocess
 import sys
+from collections import defaultdict
 
 from analysis import RNASeq, DESeq2
-from helpers import ConfigParser
+from helpers import ConfigParser, make_path, move_path, delete_path
 
 
 def public_rnaseq_example(ids: list):
@@ -48,9 +51,19 @@ def public_rnaseq_example(ids: list):
             seq.run()
 
 
-def public_deseq2_example(mtd: str):
+def public_deseq2_example(mtd: str,
+                          sample_list: list,
+                          condition_details: list,
+                          contrast: list):
+    config.log.info(f"Starting analysis with following parameters")
+    config.log.info(f"Samples : {sample_list}")
+    config.log.info(f"Conditions : {condition_details}")
+    config.log.info(f"Contrast : {contrast}")
+
     # List of SRA ids for DESeq2 analysis
-    sample_list = ["SRX4720628", "SRX4720629", "SRX4720625", "SRX4720626"]
+    # E.g.
+    # sample_list = ["SRX3187828", "SRX3187834", "SRX3187822", "SRX3187825",
+    #                "SRX3187837", "SRX3187839"]
 
     # Their conditions
     # In this example, I am using samples taken at different time
@@ -58,7 +71,9 @@ def public_deseq2_example(mtd: str):
     # Here we are using 24hpf as a control or starting point. And by
     # convention in DESeq2 program, control is provided at the end.
     condition = "time"
-    condition_details = ["48hpf", "48hpf", "24hpf", "24hpf"]
+
+    # E.g condition_details = ["48hpf", "48hpf", "48hpf", "30hpf", "30hpf",
+    # "30hpf"]
 
     # Generate DESeq2 object with desired method
     # Currently 4 methods are available [star, salmon, kallisto, stringtie]
@@ -79,12 +94,69 @@ def public_deseq2_example(mtd: str):
 
     # We can provide contrast matrix for LFC shrinkage.
     # If not given, LFC Shrinkage will not be performed
-    deq.contrast = [condition, "48hpf", "24hpf"]
+    # E.g. : ["time", "48hpf", "30hpf"]
+    deq.contrast = contrast
     deq.alpha = 0.05  # Alpha usually decided p-value threshold of FDR. This
     # will affect the adjusted-p-value in the final result
 
     # Run the analysis
     deq.run()
+
+
+def package_analysis(name: str):
+    input_folder = config.deseq2_final_output
+    base_path = input_folder.replace("Analysis", "DEOut")
+    make_path(base_path)
+    working_path = f"{base_path}/{name}"
+    move_path(input_folder, working_path)
+    # While using tar from another dictionary, remember to use -C option
+    opts = [
+        "tar",
+        "-czf",
+        f"{base_path}/{name}.tar.gz",
+        "-C",
+        base_path,
+        name
+    ]
+    if subprocess.run(opts).returncode != 0:
+        config.log.error(
+            f"Something went wrong while creating archive of {working_path}")
+
+    delete_path(working_path)
+    config.log.info(f"Archive created at {working_path}")
+
+
+def sample_combination():
+    data = defaultdict(list)
+    with open("samples.csv") as file:
+        for line2 in file:
+            d = line2.strip().split(',')
+            data[d[1]].append(d[0])
+
+    pairs = itertools.combinations(data.keys(), 2)
+    for pair in pairs:
+        current_samples = data[pair[0]]
+        current_times = [pair[0] for _ in range(len(data[pair[0]]))]
+        current_samples.extend(data[pair[1]])
+        current_times.extend(
+            [pair[1] for _ in range(len(data[pair[1]]))]
+        )
+        current_times = [f"{x}hpf" for x in current_times]
+        current_contrast = sorted(pair, reverse=True)
+        current_contrast = [f"{x}hpf" for x in current_contrast]
+        current_contrast.insert(0, "time")
+        # Make folder for the analysis
+        make_path(config.deseq2_final_output)
+        #
+        # DESeq2 analysis
+        # DESeq2 example with all 4 methods
+        for method in ["star", "salmon", "kallisto", "stringtie"]:
+            public_deseq2_example(method,
+                                  current_samples,
+                                  current_times,
+                                  current_contrast)
+        #
+        package_analysis(f"Analysis{pair[0]}v{pair[1]}")
 
 
 if __name__ == "__main__":
@@ -105,6 +177,4 @@ if __name__ == "__main__":
         all_ids.append(str(sys.argv[2]).strip().upper())
         config.log.info(f"Analysis will start for {all_ids[0]}")
 
-    # DESeq2 example with all 4 methods
-    for method in ["star", "salmon", "kallisto", "stringtie"]:
-        public_deseq2_example(method)
+    sample_combination()
