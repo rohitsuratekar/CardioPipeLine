@@ -5,6 +5,8 @@ library("readr") # Reading csv properly
 library("Rsubread") # Need for featureCount function
 # For importing and generating count matrixes
 library("tximport")
+library("apeglm")
+suppressPackageStartupMessages(library('SummarizedExperiment'))
 suppressPackageStartupMessages(library('AnnotationDbi'))
 suppressPackageStartupMessages(library('GenomicFeatures'))
 # For DESeq2
@@ -76,7 +78,7 @@ collect_deseq2_results <- function(dds, data) {
     res <- DESeq2::results(dds, contrast = data$contrast, alpha = data$alpha)
 
 
-    lfc_res <- DESeq2::lfcShrink(dds, contrast = data$contrast, res = res)
+    lfc_res <- DESeq2::lfcShrink(dds, coef = 2, res = res, type = "apeglm")
 
     # Save the result
     file_name <- paste0(data$output, "/", data$method, ".result_lfc.csv")
@@ -128,4 +130,19 @@ generate_count_matrix <- function(all_files, all_runs, data) {
   write.csv(fc$stat, file = stat, row.names = FALSE)
 
   return(df)
+}
+
+save_transformed_data <- function(dds, data) {
+  vsd <- DESeq2::vst(dds)
+  rld <- DESeq2::rlog(dds)
+  vassay <- SummarizedExperiment::assay(vsd, blind = FALSE)
+  rassay <- SummarizedExperiment::assay(rld, blind = FALSE)
+
+  # Save
+  name <- paste0(data$output, "/", data$method, ".vst.csv")
+  save_counts(as.data.frame(vassay), name)
+  name <- paste0(data$output, "/", data$method, ".rlog.csv")
+  save_counts(as.data.frame(rassay), name)
+
+  return(TRUE)
 }

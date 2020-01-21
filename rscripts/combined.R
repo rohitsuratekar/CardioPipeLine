@@ -78,6 +78,8 @@ perform_regular <- function() {
   dds <- perform_deseq2_with_txi(txi, data, meta)
   res <- collect_deseq2_results(dds, data)
 
+  save_transformed_data(dds, data)
+
   return(res)
 }
 
@@ -86,6 +88,7 @@ if (data$method == "star") {
   counts <- generate_count_matrix(all_files, all_runs, data)
   dds <- perform_deseq2_with_counts(counts, data, get_meta())
   res <- collect_deseq2_results(dds, data)
+  save_transformed_data(dds, data)
 }else {
   res <- perform_regular()
 }

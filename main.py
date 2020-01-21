@@ -135,7 +135,7 @@ def sample_combination():
 
     pairs = itertools.combinations(data.keys(), 2)
     for pair in pairs:
-        current_samples = data[pair[0]]
+        current_samples = [x for x in data[pair[0]]]
         current_times = [pair[0] for _ in range(len(data[pair[0]]))]
         current_samples.extend(data[pair[1]])
         current_times.extend(
@@ -155,7 +155,7 @@ def sample_combination():
                                   current_samples,
                                   current_times,
                                   current_contrast)
-        #
+        
         package_analysis(f"Analysis{pair[0]}v{pair[1]}")
 
 
