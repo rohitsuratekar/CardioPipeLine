@@ -155,7 +155,7 @@ def sample_combination():
                                   current_samples,
                                   current_times,
                                   current_contrast)
-        
+            
         package_analysis(f"Analysis{pair[0]}v{pair[1]}")
 
 

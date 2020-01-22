@@ -2,3 +2,5 @@ local.py
 .idea/
 *.pyc
 cardio.log
+.Rproj.user
+.Rhistory

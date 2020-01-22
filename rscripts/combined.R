@@ -10,7 +10,7 @@ library("jsonlite") # To read the json file (configuration file)
 # assumes that it is run from the python pipeline
 source("rscripts/functions.R")
 
-
+# Here config file is NOT the 'config.json' which is used
 opt_meta <- optparse::make_option(c("-c", "--config"), help = "Full path of the
 configuration file.")
 
@@ -85,7 +85,10 @@ perform_regular <- function() {
 
 
 if (data$method == "star") {
+
+  # Get the counts
   counts <- generate_count_matrix(all_files, all_runs, data)
+  # Perform further analysis
   dds <- perform_deseq2_with_counts(counts, data, get_meta())
   res <- collect_deseq2_results(dds, data)
   save_transformed_data(dds, data)

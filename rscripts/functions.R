@@ -36,9 +36,10 @@ get_tx2gene <- function(method, all_files, gtf) {
 }
 
 save_counts <- function(d, file_name) {
-  temp_df <- as.data.frame(d)
+  temp_df <- data.frame(d)
   data.table::setDT(temp_df, keep.rownames = "gene_id")
   write.csv(temp_df, file = file_name, row.names = FALSE)
+  return(d)
 }
 
 
@@ -92,9 +93,8 @@ collect_deseq2_results <- function(dds, data) {
     final_res <- res
   }
 
-  # Save the result
-  file_name <- paste0(data$output, "/", data$method, ".result.csv")
-  save_counts(lfc_res, file_name)
+  print(head(res))
+
   # Save the result
   file_name <- paste0(data$output, "/", data$method, ".result.csv")
   save_counts(lfc_res, file_name)
@@ -122,14 +122,17 @@ generate_count_matrix <- function(all_files, all_runs, data) {
     isPairedEnd = paried_end,
     nthreads = data$threads)
 
-  df <- as.data.frame(fc$counts)
+  df <- data.frame(fc$counts)
   colnames(df) <- all_runs
   name <- paste0(data$output, "/", data$method, ".counts.csv")
   save_counts(df, name)
   stat <- paste0(data$output, "/", data$method, ".counts.csv.stat")
   write.csv(fc$stat, file = stat, row.names = FALSE)
 
-  return(df)
+  # Return dataframe with row names
+  rdf <- data.frame(fc$counts)
+  colnames(rdf) <- all_runs
+  return(rdf)
 }
 
 save_transformed_data <- function(dds, data) {
