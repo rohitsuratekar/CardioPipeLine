@@ -20,18 +20,24 @@ class PrepareRNAseq(PipeLine):
         self.log.info("PrepareRNAseq pipeline initialized")
 
     def download_run(self, srr: str):
-        opts = [
-            "--verbose",  # Verbose to see logs
-            srr.strip()  # Run ID for downloading
-        ]
-        self.log.info("Downloading started")
-        self.config.tools.prefetch.run(opts,
-                                       success=f"{srr} run is downloaded "
-                                               f"in {self.config.names.sra.ncbi_public}")
-
-        # Move to the SRA folder for further analysis
         origin = f"{self.config.names.sra.ncbi_public}/sra/{srr}.sra"
         destination = self.config.names.sra.raw_data(self.sra, srr)
+
+        # Check if file exists
+        if not exists_path(origin):
+
+            opts = [
+                srr.strip()  # Run ID for downloading
+            ]
+            self.log.info("Downloading started")
+            self.config.tools.prefetch.run(opts,
+                                           success=f"{srr} run is downloaded "
+                                                   f"in {self.config.names.sra.ncbi_public}")
+
+        else:
+            self.log.info("Skipping download. File already exists")
+
+        # Move to the SRA folder for further analysis
         move_path(origin, destination)
         self.log.info(f"SRA file for {srr} downloaded and moved to default "
                       f"SRA folder {destination}")
@@ -65,7 +71,7 @@ class PrepareRNAseq(PipeLine):
                 self.config.names.sra.raw_data(self.sra, srr),  # Path to
                 # input SRA file
                 "--split-files",  # Splits files according to Reads
-                "--progress",  # Show progress
+                "--progres",  # Show progress
                 "--skip-technical",  # Skip technical reads
                 "--threads",  # Number of threads
                 str(self.config.no_of_threads),

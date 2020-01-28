@@ -41,11 +41,11 @@ def public_rnaseq_example(ids: list):
             seq = RNASeq(sra, config)
             # By default, all analysis will be performed.
             # You can selectively switch off specific analysis
-            seq.star = False  # If you do not want STAR analysis
+            seq.star = True  # If you do not want STAR analysis
 
             # By default, at the end, unnecessary converted files will be
             # deleted. However, you can block this behaviour like following
-            seq.cleanup = False
+            seq.cleanup = True
 
             # Finally run the analysis
             seq.run()
@@ -155,7 +155,7 @@ def sample_combination():
                                   current_samples,
                                   current_times,
                                   current_contrast)
-            
+
         package_analysis(f"Analysis{pair[0]}v{pair[1]}")
 
 
@@ -177,4 +177,5 @@ if __name__ == "__main__":
         all_ids.append(str(sys.argv[2]).strip().upper())
         config.log.info(f"Analysis will start for {all_ids[0]}")
 
-    sample_combination()
+    # sample_combination()
+    public_rnaseq_example(all_ids)

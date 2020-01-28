@@ -15,7 +15,7 @@
     "ncbi_public": "/home/rsuratekar/ncbi/public"
   },
   "tools": {
-    "sratools": "/home/rsuratekar/Documents/Rohit/Tools/sratoolkit.2.10.0-ubuntu64/bin",
+    "sratools": "/home/rsuratekar/Documents/Rohit/Tools/sratoolkit.2.10.2-ubuntu64/bin",
     "star": "/home/rsuratekar/Documents/Rohit/Tools/STAR-2.7.3a/bin/Linux_x86_64",
     "salmon": "/home/rsuratekar/Documents/Rohit/Tools/salmon-latest_linux_x86_64/bin",
     "mashmap": "/home/rsuratekar/Documents/Rohit/Tools/mashmap-Linux64-v2.0",
