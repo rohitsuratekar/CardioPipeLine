@@ -1,0 +1,15 @@
+# All analysis file will be under this base folder with proper SRR name
+srr_path: "/mnt/data/LocalDB/srr"
+
+# Number of threads (This will be used whenever possible)
+threads: 8
+
+# All Tools and their binaries.
+tools:
+  prefetch: "/home/rsuratekar/Documents/Rohit/Tools/sratoolkit.2.10.2-ubuntu64/bin/prefetch"
+  fasterq-dump: "/home/rsuratekar/Documents/Rohit/Tools/sratoolkit.2.10.2-ubuntu64/bin/fasterq-dump"
+  sortmerna: "/home/rsuratekar/Documents/Rohit/Tools/sortmerna-4.0.0/bin/sortmerna"
+
+# SorMeRNA database
+rrna_db: "/home/rsuratekar/Documents/Rohit/Genome/rrna"
+rrn_index: "/home/rsuratekar/Documents/Rohit/Genome/index/sortmerna"

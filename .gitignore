@@ -4,3 +4,4 @@ local.py
 cardio.log
 .Rproj.user
 .Rhistory
+.snakemake/*
