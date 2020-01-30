@@ -1,20 +1,15 @@
-import pandas as pd
-
-include: "rules/common.smk"
+configfile: "config/config.yaml"
 
 
-def run_all():
-    samples = pd.read_csv("config/samples.csv")
-    expected_outputs = []
-    for sample in samples.itertuples():
-        srr = getattr(sample, "Run")
-        path = config["srr_path"]
-        expected_outputs.append(f"{srr}.sra")
-    return expected_outputs
+def get_inputs(wildcards):
+    srr = "SRR7882018"
+    base_path = config['base']
+    return [f"{srr}.sra"]
 
 
 rule run_workflow:
-    input: run_all()
+    input: get_inputs
+    shell:
+         "echo Workflow Finished"
 
-include: "rules/ncbi.smk"
-include: "rules/rrna.smk"
+include: "rules/preprocess.smk"
