@@ -43,7 +43,6 @@ rule salmon_quant:
          # to ensure that index is prepared.
          gtf=config["genome"]["gtf_annotation"],
          files=method_reads,
-         check=check_filtering
     output:
           expand("{folder}/methods/salmon/{srr}/quant.sf",
                  folder=BASE, srr="{SRR_ID}")

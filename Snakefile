@@ -32,7 +32,11 @@ def get_inputs(wildcards):
     runs = SAMPLES["Run"].values
     outputs = []
     for srr in runs:
+        # f = f"{config['base']}/fastq/{srr}/{srr}.sra_1.fastq"
         outputs.append(output_file("salmon", srr))
+        outputs.append(output_file("stringtie", srr))
+        outputs.append(output_file("kallisto", srr))
+    # outputs.append(f)
     return outputs
 
 

@@ -32,7 +32,6 @@ rule kallisto_quant:
          k_index=f"{BASE}/index/kallisto/kallisto.idx",
          gtf=config["genome"]["gtf_annotation"],
          files=method_reads,
-         check=check_filtering
     threads: config["threads"]
     output:
           expand("{folder}/methods/kallisto/{srr}/abundance.tsv",
