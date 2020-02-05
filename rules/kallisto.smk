@@ -31,7 +31,8 @@ rule kallisto_quant:
          kallisto=config["tools"]["kallisto"],
          k_index=f"{BASE}/index/kallisto/kallisto.idx",
          gtf=config["genome"]["gtf_annotation"],
-         files=method_input_files
+         files=method_reads,
+         check=check_filtering
     threads: config["threads"]
     output:
           expand("{folder}/methods/kallisto/{srr}/abundance.tsv",
@@ -47,11 +48,3 @@ rule kallisto_quant:
          "--bias "  # Sequence based bias correction,
          "--plaintext "  # Plaintext output instead HDF5
          "{params.reads}"  # Add reads and layout specific options
-
-rule dry_run:
-    input:
-         expand("{folder}/methods/kallisto/{srr}/abundance.tsv",
-                folder=BASE, srr="{SRR_ID}")
-    output: "{SRR_ID}.sra"
-    shell:
-         "touch {wildcards.SRR_ID}.sra"

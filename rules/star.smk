@@ -23,7 +23,8 @@ rule run_star:
     input:
          star=config["tools"]["star"],
          star_index=expand("{folder}/index/star/SAindex", folder=BASE),
-         files=method_input_files
+         files=method_reads,
+         check=check_filtering
     output:
           bam=expand("{folder}/methods/star/{srr}/{"
                      "srr}_Aligned.sortedByCoord.out.bam",

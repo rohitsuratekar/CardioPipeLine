@@ -4,32 +4,21 @@ import shutil
 BASE = config['base']
 
 checkpoint convert_fastq:
-    input: config["tools"]["fasterq-dump"]
-    output: out=directory(BASE + "/fastq/{SRR_ID}")
+    input:
+         fasterq=config["tools"]["fasterq-dump"],
+         sra_file=expand("{folder}/srr/{srr}.sra", folder=BASE,
+                         srr="{SRR_ID}")
+    output: out=directory(os.path.join(BASE, "fastq", "{SRR_ID}"))
     threads: config['threads']
     # Remember to keep space after each of the options
     shell:
-         "{input} "  # Binary
-         "{BASE}/srr/{wildcards.SRR_ID}/{wildcards.SRR_ID}.sra "
+         "{input.fasterq} "  # Binary
+         "{input.sra_file} "  # Input SRA File
          "--split-files "  # Split files according to the reads
          "--progres "  # Show progress
          "--skip-technical "  # Skip technical reads
          "--threads {threads} "  # Number of threads
-         "--outdir {output}"
-
-
-def collect_fastq(wildcards):
-    # Check if folder is empty
-    base = "{}/fastq/{}".format(BASE, wildcards.SRR_ID)
-    if os.path.exists(base):
-        if len(os.listdir(base)) == 0:
-            # Folder is empty and remove it
-            shutil.rmtree(base)
-
-    path = checkpoints.convert_fastq.get(SRR_ID=wildcards.SRR_ID).output[0]
-    return expand("{path}/{file}.fastq",
-                  path=path,
-                  file=glob_wildcards(os.path.join(path, "{name}.fastq")).name)
+         "--outdir {BASE}/fastq/{wildcards.SRR_ID}"
 
 
 def get_refs(wildcards):
@@ -40,6 +29,21 @@ def get_refs(wildcards):
             # eukaryotic data
             files.append(f"{path}/{f}")
     return files
+
+
+def get_fastq(wildcards):
+    base = "{}/fastq/{}".format(BASE, wildcards.SRR_ID)
+    if os.path.exists(base):
+        files = glob_wildcards(os.path.join(base, "{name}.fastq")).name
+        if len(files) == 0:
+            # Folder is empty and remove it
+            shutil.rmtree(base)
+            print("Deleted empty folder for fastq conversion")
+
+    path = checkpoints.convert_fastq.get(**wildcards).output.out
+    return expand("{path}/{file}.fastq",
+                  path=path,
+                  file=glob_wildcards(os.path.join(path, "{name}.fastq")).name)
 
 
 # Option explanation
@@ -53,9 +57,9 @@ def get_refs(wildcards):
 # recommended in the manual is to set this value to 1)
 # -paired_in : if either of read match, put both reads into the 'aligned.fasta' file
 
-checkpoint filter_rrna:
+rule filter_rrna:
     input:
-         reads=collect_fastq,
+         reads=get_fastq,
          refs=get_refs,
          sortmerna=config["tools"]["sortmerna"]
     output: directory(BASE + "/filtered/{SRR_ID}")
@@ -93,22 +97,31 @@ checkpoint filter_rrna:
          """
 
 
-def collect_filtered(wildcards):
-    # Check if folder is empty
-    base = "{}/filtered/{}".format(BASE, wildcards.SRR_ID)
+def check_filtering(wildcards):
+    log_file = f"{BASE}/logs/{wildcards.SRR_ID}.filtered.log"
+    # Check filtered files are available
+    base = f"{BASE}/filtered/{wildcards.SRR_ID}"
     if os.path.exists(base):
-        if len(os.listdir(base)) == 0:
+        files = glob_wildcards(os.path.join(base, "{name}.fastq")).name
+        if len(files) == 0:
             # Folder is empty and remove it
-            shutil.rmtree(base)
-
-    path = checkpoints.filter_rrna.get(**wildcards).output[0]
-    return expand("{path}/{file}.fastq",
-                  path=path,
-                  file=glob_wildcards(os.path.join(path, "{name}.fastq")).name)
-
-
-def method_input_files(wildcards):
-    if config['filter_rrna'] == 1:
-        return sorted(collect_filtered(wildcards))
+            os.remove(log_file)
+            print("Log file deleted to force filtering")
     else:
-        return sorted(collect_fastq(wildcards))
+        try:
+            os.remove(log_file)
+        except FileNotFoundError:
+            pass
+
+    return log_file
+
+
+def method_reads(wildcards):
+    if config["filter_rrna"] == 1:
+        return expand("{folder}/filtered/{srr}/{file}.fastq", folder=BASE,
+                      srr=wildcards.SRR_ID,
+                      file=glob_wildcards(os.path.join(BASE, "filtered/{"
+                                                             "SRR_ID}",
+                                                       "{name}.fastq")).name)
+    else:
+        return get_fastq(wildcards)

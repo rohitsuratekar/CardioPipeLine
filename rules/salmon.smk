@@ -42,7 +42,8 @@ rule salmon_quant:
          salmon_index=f"{BASE}/index/salmon/pos.bin",  # This is just needed
          # to ensure that index is prepared.
          gtf=config["genome"]["gtf_annotation"],
-         files=method_input_files
+         files=method_reads,
+         check=check_filtering
     output:
           expand("{folder}/methods/salmon/{srr}/quant.sf",
                  folder=BASE, srr="{SRR_ID}")
@@ -65,5 +66,3 @@ rule salmon_quant:
          "-g {input.gtf} "  # Additional GTF file to get quants.genes.sf
          "-o {BASE}/methods/salmon/{wildcards.SRR_ID} "  # output folder
          "{params.reads}"  # Input reads
-
-
