@@ -1,51 +1,46 @@
 import pandas as pd
 
-configfile: "config/config.yaml"
+configfile: 'config/config.yaml'
 
 wildcard_constraints:
                     SRR_ID="[SRR].*"
 
-SAMPLES = pd.read_csv("config/samples.csv")
+SAMPLES_DF = pd.read_csv(config['samples'])
+BASE = config['base']
 
 
-def layout_expand(srr: str):
-    data = dict(zip(SAMPLES["Run"], SAMPLES["LibraryLayout"]))
-    return data[srr.strip()] == "PAIRED"
+def is_paired(wildcards) -> bool:
+    """
+    Checks if given run is with paired-end or single-end
+    :return: True, if it is paired end
+    """
+    for _, row in SAMPLES_DF.iterrows():
+        run = row["run"]
+        if run.strip() == wildcards.SRR_ID:
+            return row["is_paired"]
+    raise KeyError(f"{wildcards.SRR_ID} not found in 'samples.csv'")
 
 
-def output_file(method: str, srr: str):
-    # Sanity check
-    if method not in ["star", "salmon", "kallisto", "stringtie"]:
-        raise Exception(f"Method {method} is not available in this workflow")
-    base = f"{config['base']}/methods/{method.strip().lower()}/{srr}"
-    if method == "salmon":
-        return f"{base}/quant.sf"
-    elif method == "kallisto":
-        return f"{base}/abundance.tsv"
-    elif method == "star":
-        return f"{base}/{srr.strip()}_Aligned.sortedByCoord.out.bam"
-    elif method == "stringtie":
-        return f"{base}/{srr.strip()}_gene_expression.tsv"
+def get_final_outputs(wildcards):
+    files = []
+    base_f = f"{config['base']}/filtered"
+    for _, row in SAMPLES_DF.iterrows():
+        srr = row["run"]
+        if row["is_paired"]:
+            files.append(f"{base_f}/{srr}.sra.filtered_1.fastq")
+            files.append(f"{base_f}/{srr}.sra.filtered_2.fastq")
+        else:
+            files.append(f"{base_f}/{srr}.filtered.fastq")
+    return files
 
 
-def get_inputs(wildcards):
-    runs = SAMPLES["Run"].values
-    outputs = []
-    for srr in runs:
-        # f = f"{config['base']}/fastq/{srr}/{srr}.sra_1.fastq"
-        outputs.append(output_file("salmon", srr))
-        outputs.append(output_file("stringtie", srr))
-        outputs.append(output_file("kallisto", srr))
-    # outputs.append(f)
-    return outputs
+"""
+Important: Rule order is important. Be careful with which rule you use before.
+"""
+rule all:
+    input: get_final_outputs
+    threads: config["threads"]
 
-
-rule run_workflow:
-    input: get_inputs
-    shell:
-         "echo Workflow Finished"
-
-include: "rules/preprocess.smk"
-include: "rules/star.smk"
-include: "rules/salmon.smk"
-include: "rules/kallisto.smk"
+# Include all other rules files
+include: "rules/ncbi.smk"
+include: "rules/sortmerna.smk"

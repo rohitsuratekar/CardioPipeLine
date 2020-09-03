@@ -5,8 +5,6 @@
 #
 # Main file for handling all the configuration
 
+import subprocess
 
-from scripts.url_download import download_from_url
-
-if __name__ == "__main__":
-    pass
+subprocess.run(["snakemake", "--core", "all"])

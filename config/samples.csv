@@ -1,2 +1,2 @@
-Run,BioProject,BioSample,Experiment,Instrument,LibraryLayout,LibrarySelection,LibrarySource,Organism,Platform,ReleaseDate,Sample Name,SRA Study,tissue,time,genetic_background
-SRR7882031,PRJNA492280,SAMN10095805,SRX4720641,NextSeq 500,PAIRED,cDNA,TRANSCRIPTOMIC,Danio rerio,ILLUMINA,2019-01-23T00:00:00Z,GSM3396549,SRP162234,FACS-sorted embryo cells,72,hand2
+run,is_paired
+SRR7882031,true
