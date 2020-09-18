@@ -1,4 +1,5 @@
 import pandas as pd
+from models.basic import PipeLine
 
 configfile: 'config/config.yaml'
 
@@ -22,15 +23,12 @@ def is_paired(wildcards) -> bool:
 
 
 def get_final_outputs(wildcards):
+    p = PipeLine("config/config.yaml")
     files = []
-    base_f = f"{config['base']}/filtered"
     for _, row in SAMPLES_DF.iterrows():
         srr = row["run"]
-        if row["is_paired"]:
-            files.append(f"{base_f}/{srr}.sra.filtered_1.fastq")
-            files.append(f"{base_f}/{srr}.sra.filtered_2.fastq")
-        else:
-            files.append(f"{base_f}/{srr}.filtered.fastq")
+        paired = bool(row["is_paired"])
+        files.extend(p.output_files(srr, paired))
     return files
 
 
@@ -42,5 +40,8 @@ rule all:
     threads: config["threads"]
 
 # Include all other rules files
+# This order is also important as some of the functions are reused in other
+# files.
 include: "rules/ncbi.smk"
 include: "rules/sortmerna.smk"
+include: "rules/star.smk"

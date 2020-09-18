@@ -33,6 +33,7 @@ def get_refs(wildcards):
 # -paired_in : if either of read match, put both reads into the 'aligned.fasta' file
 # --out2 : Fastq files will be split automatically
 
+# For Paired layout
 rule filter_rrna_paired:
     input:
          reads=expand("{folder}/fastq/{srr}.sra_{i}.fastq",
@@ -50,7 +51,6 @@ rule filter_rrna_paired:
           read_str=lambda wildcards, input: " ".join(
               ["-reads {}".format(x) for x in input.reads]),
           index_dir="{}/index/sortmerna".format(BASE),
-          filter_pre=lambda wildcards: "{}.filtered_".format(wildcards.SRR_ID),
     shell:
          """
          rm -rf {params.index_dir}/kvdb
@@ -62,4 +62,44 @@ rule filter_rrna_paired:
          mkdir -p {BASE}/logs
          
          mv {params.index_dir}/out/aligned.log {BASE}/logs/{wildcards.SRR_ID}_filtering.log
+         
+         mv {params.index_dir}/out/other_fwd.fastq {BASE}/filtered/{wildcards.SRR_ID}.sra.filtered_1.fastq
+         mv {params.index_dir}/out/other_rev.fastq {BASE}/filtered/{wildcards.SRR_ID}.sra.filtered_2.fastq
+         
+         rm  -f {params.index_dir}/out/aligned_fwd.fastq
+         rm  -f {params.index_dir}/out/aligned_rev.fastq
+         """
+
+# For single layout
+rule filter_rrna_single:
+    input:
+         reads=expand("{folder}/fastq/{srr}.sra.fastq", folder=config['base'],
+                      srr="{SRR_ID}"),
+         refs=get_refs
+    output:
+          expand("{folder}/filtered/{srr}.sra.filtered.fastq",
+                 folder=config['base'], srr="{SRR_ID}")
+    threads: config['threads']
+    params:
+          sortmerna=config["tools"]["sortmerna"],
+          ref_str=lambda wildcards, input: " ".join(
+              ["-ref {}".format(x) for x in input.refs]),
+          read_str=lambda wildcards, input: " ".join(
+              ["-reads {}".format(x) for x in input.reads]),
+          index_dir="{}/index/sortmerna".format(BASE),
+    shell:
+         """
+         rm -rf {params.index_dir}/kvdb
+         
+         {params.sortmerna} {params.ref_str} {params.read_str} -workdir {params.index_dir} -fastx -other -a {threads} -num_alignments 1 -paired_in 
+         
+         mkdir -p {BASE}/filtered/ 
+         
+         mkdir -p {BASE}/logs
+         
+         mv {params.index_dir}/out/aligned.log {BASE}/logs/{wildcards.SRR_ID}_filtering.log
+         
+         mv {params.index_dir}/out/other.fastq {BASE}/filtered/{wildcards.SRR_ID}.sra.filtered.fastq 
+         
+         rm  -f {params.index_dir}/out/aligned.fastq
          """

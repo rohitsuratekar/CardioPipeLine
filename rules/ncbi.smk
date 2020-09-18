@@ -41,12 +41,10 @@ rule get_sra:
          "--output-file {output} "  # Write to specific file
 
 rule get_fastq_paired:
-    input: expand("{folder}/sra/{srr}.sra", folder=BASE, srr="{SRR_ID}")
+    input: ancient("{BASE_FOLDER}/sra/{SRR_ID}.sra")
     threads: config["threads"]
-    output:
-          expand("{folder}/fastq/{srr}.sra_{i}.fastq", folder=BASE,
-                 srr="{SRR_ID}", i=[1, 2])
-
+    output:"{BASE_FOLDER}/fastq/{SRR_ID}.sra_1.fastq",
+          "{BASE_FOLDER}/fastq/{SRR_ID}.sra_2.fastq"
     params:
           fasterq=config["tools"]["fasterq-dump"]
 
@@ -60,7 +58,7 @@ rule get_fastq_paired:
          "--outdir {BASE}/fastq"
 
 rule get_fastq_single:
-    input: "{BASE_FOLDER}/sra/{SRR_ID}.sra"
+    input: ancient("{BASE_FOLDER}/sra/{SRR_ID}.sra")
     threads: config["threads"]
     output: "{BASE_FOLDER}/fastq/{SRR_ID}.sra.fastq"
     params:

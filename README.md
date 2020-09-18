@@ -24,7 +24,9 @@ In order to change the default options, you will need to change appropriate
  
 ### Dependencies
 * `python3+` (tested on Python3.7 and 3.8)
-* [snakemake](https://snakemake.readthedocs.io/en/stable/)
+* [snakemake](https://snakemake.readthedocs.io/en/stable/) (worlflow
+ management)
+* [pyyaml](https://pyyaml.org/) (To read the configuration file)
 * [pandas](https://pandas.pydata.org/) (Was needed only for one function but
  I am too lazy to implement that function with in-build libraries.)
 * `R 4+` (in case you want DESeq2 analysis. Tested on R 4.0.2)
@@ -61,6 +63,7 @@ This pipeline performs tasks in following order. However, you can always
     
 | Task No | Details | Tool Used | Input <sup>#</sup> | Main Output<sup> #, * </sup> |
 | :------ | :----- | :------ | :----| :--- |
+| 0 | All tasks | -- | -- | -- |
 | 1 | Download `.sra` file| `prefetch` | samples.csv | srr.sra |
 | 2 | Convert to `fastq` | `fasterq-dump` | srr.sra | srr.fastq|
 | 3 | rRNA filtering | `sortmerna` | srr.fastq | srr.filtered.fastq |
@@ -75,7 +78,7 @@ This pipeline performs tasks in following order. However, you can always
 | 12 | Count Matrix generation | `tximport` | quants.tsv / mapping.tsv | counts.csv |
 | 13 | Differential Analysis | `DESeq2` | counts.csv | exp.csv |
 | 14 | Clean up | `shell` | -- | -- |
-| 15 | All tasks | -- | -- | -- |
+
 
 <sup>* There might be many other related outputs. </sup> 
 <sup># Names are for representative purpose. Actual names will be different
@@ -123,8 +126,8 @@ base
 │   ├── SRR0000001.sra.filtered_2.fastq
 |   └── SRR0000002.sra.filtered.fastq
 ├── bams
-│   ├── SRR0000001.sra.BAM
-|   └── SRR0000002.sra.BAM
+│   ├── SRR0000001.sra.Aligned.sortedByCoord.out.bam
+|   └── SRR0000002.sra.Aligned.sortedByCoord.out.bam
 ├── index
 │   ├── star / .. 
 |   ├── sortmerna / ..
