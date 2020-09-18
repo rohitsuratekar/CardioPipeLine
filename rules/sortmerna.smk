@@ -36,12 +36,12 @@ def get_refs(wildcards):
 # For Paired layout
 rule filter_rrna_paired:
     input:
-         reads=expand("{folder}/fastq/{srr}.sra_{i}.fastq",
-                      folder=config['base'], srr="{SRR_ID}", i=[1, 2]),
+         reads=["{BASE_FOLDER}/fastq/{SRR_ID}.sra_1.fastq",
+                "{BASE_FOLDER}/fastq/{SRR_ID}.sra_2.fastq"],
          refs=get_refs
     output:
-          expand("{folder}/filtered/{srr}.sra.filtered_{i}.fastq",
-                 folder=config['base'], srr="{SRR_ID}", i=[1, 2])
+          ["{BASE_FOLDER}/filtered/{SRR_ID}.sra.filtered_1.fastq",
+           "{BASE_FOLDER}/filtered/{SRR_ID}.sra.filtered_2.fastq"]
 
     threads: config['threads']
     params:
@@ -73,12 +73,10 @@ rule filter_rrna_paired:
 # For single layout
 rule filter_rrna_single:
     input:
-         reads=expand("{folder}/fastq/{srr}.sra.fastq", folder=config['base'],
-                      srr="{SRR_ID}"),
+         reads="{BASE_FOLDER}/fastq/{SRR_ID}.sra.fastq",
          refs=get_refs
     output:
-          expand("{folder}/filtered/{srr}.sra.filtered.fastq",
-                 folder=config['base'], srr="{SRR_ID}")
+          "{BASE_FOLDER}/filtered/{SRR_ID}.sra.filtered.fastq"
     threads: config['threads']
     params:
           sortmerna=config["tools"]["sortmerna"],

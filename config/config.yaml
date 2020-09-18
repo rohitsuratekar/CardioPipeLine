@@ -39,9 +39,24 @@ genome:
 #
 # Avoid using aliases. Whenever possible provide full path. On linux you can
 # check path of the already installed program by using 'which' command.
+#
+# stringtie-count : PythonScript provided by StringTie for generating matrix
+# (only needed when performing DE analysis on StringTie results)
 
 tools:
   prefetch: "/home/rsuratekar/Documents/Rohit/Tools/sratoolkit.2.10.8-ubuntu64/bin/prefetch"
   fasterq-dump: "/home/rsuratekar/Documents/Rohit/Tools/sratoolkit.2.10.8-ubuntu64/bin/fasterq-dump"
   sortmerna: "/home/rsuratekar/Documents/Rohit/Tools/sortmerna-4.2.0-Linux/bin/sortmerna"
   star: "/home/rsuratekar/Documents/Rohit/Tools/STAR-2.7.5c/bin/Linux_x86_64/STAR"
+  stringtie: "/home/rsuratekar/Documents/Rohit/Tools/stringtie-2.1.4.Linux_x86_64/stringtie"
+  stringtie-count: "/home/rsuratekar/Documents/Rohit/Tools/stringtie-2.1.4.Linux_x86_64/prepDE.py"
+  bedtools: "/home/rsuratekar/Documents/Rohit/Tools/bedtools2/bin/bedtools"
+  mashmap: "/home/rsuratekar/Documents/Rohit/Tools/mashmap-Linux64-v2.0/mashmap"
+  salmon: "/home/rsuratekar/Documents/Rohit/Tools/salmon-latest_linux_x86_64/bin/salmon"
+  kallisto: "/home/rsuratekar/Documents/Rohit/Tools/kallisto/kallisto"
+
+
+# Extra parameter values needed for Kallisto analysis of Single Layout Reads
+extra:
+  kallisto-fragment-length: 200
+  kallisto-standard-deviation: 20

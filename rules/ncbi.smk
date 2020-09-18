@@ -6,20 +6,6 @@ Author: Rohit Suratekar, ZDG Lab, IIMCB
 This deals with all rules related to NCBI-tools
 """
 
-BASE = config['base']
-
-
-def get_fastq_names(wildcards):
-    files = []
-    base_f = f"{config['base']}/fastq"
-    if is_paired(wildcards):
-        files.append(f"{base_f}/{wildcards.SRR_ID}_1.fastq")
-        files.append(f"{base_f}/{wildcards.SRR_ID}_2.fastq")
-    else:
-        files.append(f"{base_f}/{wildcards.SRR_ID}.fastq")
-    return files
-
-
 """
 Downloads SRA files with prefetch.
 
@@ -36,7 +22,7 @@ rule get_sra:
     params:
           prefetch=config['tools']['prefetch']
     shell:
-         "mkdir -p {BASE}/sra && "  # Make folder if not present
+         "mkdir -p {wildcards.BASE_FOLDER}/sra && "  # Make folder if not present
          "{params.prefetch} -p {wildcards.SSR_ID} "  # Prefetch main command
          "--output-file {output} "  # Write to specific file
 
@@ -55,7 +41,7 @@ rule get_fastq_paired:
          "--progress "  # Show progress
          "--skip-technical "  # Skip technical reads
          "--threads {threads} "  # Number of threads
-         "--outdir {BASE}/fastq"
+         "--outdir {wildcards.BASE_FOLDER}/fastq"
 
 rule get_fastq_single:
     input: ancient("{BASE_FOLDER}/sra/{SRR_ID}.sra")
@@ -70,4 +56,4 @@ rule get_fastq_single:
          "--progress "  # Show progress
          "--skip-technical "  # Skip technical reads
          "--threads {threads} "  # Number of threads
-         "--outdir {BASE}/fastq"
+         "--outdir {wildcards.BASE_FOLDER}/fastq"

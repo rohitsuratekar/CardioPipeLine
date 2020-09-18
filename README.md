@@ -74,10 +74,11 @@ This pipeline performs tasks in following order. However, you can always
 | 8 | Salmon mapping | `salmon` | salmon-idx, srr.filtered.fastq / srr.fastq | quants.tsv |
 | 9 | Kallisto indexing | `kallisto` | anno.gtf | kallisto-idx |
 | 10 | Kallisto mapping | `kallisto` | kallisto-idx, srr.filtered.fastq / srr.fastq | mapping.tsv |
-| 11 | Count Matrix generation | `Rsubread` | ssr.bam | counts.csv |
-| 12 | Count Matrix generation | `tximport` | quants.tsv / mapping.tsv | counts.csv |
-| 13 | Differential Analysis | `DESeq2` | counts.csv | exp.csv |
-| 14 | Clean up | `shell` | -- | -- |
+| 11 | Count Matrix generation | `prepDE.py` | ssr.tsv | counts.csv |
+| 12 | Count Matrix generation | `Rsubread` | ssr.bam | counts.csv |
+| 13 | Count Matrix generation | `tximport` | quants.tsv / mapping.tsv | counts.csv |
+| 14 | Differential Analysis | `DESeq2` | counts.csv | exp.csv |
+| 15 | Clean up | `shell` | -- | -- |
 
 
 <sup>* There might be many other related outputs. </sup> 
@@ -93,12 +94,12 @@ But do not worry, thanks to `snakemake`, if you did not provide appropriate
  input files, it will  search far task which outputs these files and will
   automatically run for you. 
  
-By default `tasks: 15` is set. This will run all available tasks.
+By default `tasks: 0` is set. This will run all available tasks.
 
 ### Setting up the workflow 
 Editing `config.yaml` and `samples.csv` is probably the most important
  aspect of this pipeline. These are files which will change for each user
-  according to their system, working 
+  according to their system and work.
 
 #### config.yaml
  If you are fine  with default options of tools
@@ -108,8 +109,8 @@ Editing `config.yaml` and `samples.csv` is probably the most important
 
 Config file has parameter called `base` which provides base folder for all
  the analysis. Every output file crated with this pipeline can be found in
-  this base folder. Let us assume we are analysing `SRR0000001` (paired end
-  ) and `SRR0000002` (single end). We will get following folder structure
+  this base folder. Let us assume we are analysing `SRR0000001` (paired end) 
+  and `SRR0000002` (single end). We will get following folder structure
    after full analysis
    
 ```
@@ -134,10 +135,15 @@ base
 |   ├── salmon / ..
 |   └── kallisto / ..
 ├── mappings
-│   ├── star / .. 
-|   ├── stringtie / ..
-|   ├── salmon / ..
-|   └── kallisto / ..
+|   ├── stringtie
+|   |   ├── SRR0000001 / ..
+|   |   └── SRR0000002 / .. 
+|   ├── salmon
+|   |   ├── SRR0000001 / ..
+|   |   └── SRR0000002 / .. 
+|   └── kallisto
+|       ├── SRR0000001 / ..
+|       └── SRR0000002 / .. 
 ├── deseq2
 │   ├── star / .. 
 |   ├── stringtie / ..
