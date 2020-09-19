@@ -111,9 +111,9 @@ class PipeLine:
                     f"mappings/stringtie/{srr_id}/{srr_id}_assembled.gtf")
             elif t == TASK_COUNT_STRINGTIE:
                 out.append(
-                    f"mappings/stringtie/{srr_id}/{srr_id}.gene_count_matrix.csv")
+                    f"deseq2/counts/stringtie/{srr_id}.gene_count_matrix.csv")
                 out.append(
-                    f"mappings/stringtie/{srr_id}/{srr_id}.transcript_count_matrix.csv")
+                    f"deseq2/counts/stringtie/{srr_id}.transcript_count_matrix.csv")
             elif t == TASK_SALMON_INDEX:
                 out.append("index/salmon/pos.bin")
             elif t == TASK_SALMON_MAPPING:
@@ -122,9 +122,8 @@ class PipeLine:
                 out.append("index/kallisto/kallisto.idx")
             elif t == TASK_KALLISTO_MAPPING:
                 out.append(f"mappings/kallisto/{srr_id}/abundance.tsv")
-            elif t == TASK_DESEQ:
-                # TODO
-                out.append("test.txt")
+            elif t == TASK_COUNT_RSUB:
+                out.append(f"deseq2/counts/star/{srr_id}.star.counts")
             elif t < 16:
                 pass
             else:

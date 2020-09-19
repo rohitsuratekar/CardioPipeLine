@@ -12,7 +12,7 @@ rule index_kallisto:
          transcript=ancient(config["genome"]["transcript"])
 
     output: "{BASE}/index/kallisto/kallisto.idx"
-
+    threads: config["threads"]
     shell:
          "{input.kallisto} index "  # Kallisto index mode
          "-i {output} "  # Filename (not folder) for kallisto
