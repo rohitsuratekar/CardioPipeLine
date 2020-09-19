@@ -1,3 +1,3 @@
-run,is_paired
-SRR7882031,true
-SRR6039671,false
+run,is_paired,condition
+SRR7882031,true,24
+SRR6039671,false,48

@@ -122,6 +122,9 @@ class PipeLine:
                 out.append("index/kallisto/kallisto.idx")
             elif t == TASK_KALLISTO_MAPPING:
                 out.append(f"mappings/kallisto/{srr_id}/abundance.tsv")
+            elif t == TASK_DESEQ:
+                # TODO
+                out.append("test.txt")
             elif t < 16:
                 pass
             else:
