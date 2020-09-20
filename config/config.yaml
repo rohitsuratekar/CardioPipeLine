@@ -18,6 +18,10 @@ tasks: 0
 
 samples: "config/samples.csv"
 
+# Animal information is used in DESeq2 where gene-to-transcript functions are used.
+# Provide animal name in which you are performing current analysis
+animal: "Danio rerio"
+
 # Genome files
 #
 # Note about rRNA database:

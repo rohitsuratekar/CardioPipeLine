@@ -74,11 +74,12 @@ This pipeline performs tasks in following order. However, you can always
 | 8 | Salmon mapping | `salmon` | salmon-idx, srr.filtered.fastq / srr.fastq | quants.tsv |
 | 9 | Kallisto indexing | `kallisto` | anno.gtf | kallisto-idx |
 | 10 | Kallisto mapping | `kallisto` | kallisto-idx, srr.filtered.fastq / srr.fastq | mapping.tsv |
-| 11 | Count Matrix generation | `prepDE.py` | ssr.tsv | counts.csv |
-| 12 | Count Matrix generation | `Rsubread` | ssr.bam | counts.csv |
-| 13 | Count Matrix generation | `tximport` | quants.tsv / mapping.tsv | counts.csv |
-| 14 | Differential Analysis | `DESeq2` | counts.csv | exp.csv |
-| 15 | Clean up | `shell` | -- | -- |
+| 11 | Count Matrix StringTie | `prepDE.py` | ssr.tsv | counts.csv |
+| 12 | Count Matrix Star | `Rsubread` | ssr.bam | counts.csv |
+| 13 | Count Matrix Salmon | `tximport` | quants.sf | counts.csv |
+| 14 | Count Matrix Kallisto | `tximport` | abundance.tsv | counts.csv |
+| 15 | Differential Analysis | `DESeq2` | counts.csv | exp.csv |
+| 16 | Clean up | `shell` | -- | -- |
 
 
 <sup>* There might be many other related outputs. </sup> 
