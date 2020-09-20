@@ -26,9 +26,7 @@ In order to change the default options, you will need to change appropriate
 * `python3+` (tested on Python3.7 and 3.8)
 * [snakemake](https://snakemake.readthedocs.io/en/stable/) (worlflow
  management)
-* [pyyaml](https://pyyaml.org/) (To read the configuration file)
-* [pandas](https://pandas.pydata.org/) (Was needed only for one function but
- I am too lazy to implement that function with in-build libraries.)
+* [pandas](https://pandas.pydata.org/) 
 * `R 4+` (in case you want DESeq2 analysis. Tested on R 4.0.2)
 * `tximport`, `DESeq2`, `AnnotationDbi`, `Rsubread`, `yaml` for `R` related analysis
 

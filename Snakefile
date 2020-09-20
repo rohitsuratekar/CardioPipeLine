@@ -1,5 +1,6 @@
 import pandas as pd
 from models.basic import PipeLine
+from models.constants import TASK_DESEQ
 
 CONFIG_FILE = "config/config.yaml"
 
@@ -19,6 +20,8 @@ def get_final_outputs(wildcards):
         srr = row["run"]
         paired = row["is_paired"]
         files.extend(PIPELINE.output_files(srr, paired))
+    if TASK_DESEQ in PIPELINE.tasks:
+        files.extend(PIPELINE.get_deseq2_outputs())
     return files
 
 
@@ -43,3 +46,4 @@ include: "rules/stringtie.smk"
 include: "rules/salmon.smk"
 include: "rules/kallisto.smk"
 include: "rules/counts.smk"
+include: "rules/deseq2.smk"

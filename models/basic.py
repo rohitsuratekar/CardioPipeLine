@@ -17,6 +17,7 @@ class PipeLine:
         self.filename = config_file
         self._data = None
         self.tasks = []
+        self.de_methods = []
 
     @property
     def data(self) -> dict:
@@ -29,11 +30,6 @@ class PipeLine:
     def base(self) -> str:
         return self.data["base"]
 
-    def _add_mandatory(self):
-        # STAR mapping and STAR alignment
-        if 5 in self.tasks and 4 not in self.tasks:
-            self.tasks.append(4)
-
     def _generate_tasks(self):
         self.tasks = []
         if isinstance(self.data['tasks'], int):
@@ -43,21 +39,49 @@ class PipeLine:
                 self.tasks.append(self.data['tasks'])
         else:
             tsk = self.data['tasks'].split(',')
-            try:
-                tsk = [int(x) for x in tsk]
-            except ValueError as e:
-                raise ValueError(f"'tasks' should be integer or list of "
-                                 f"integers. e.g. tasks: 0 or tasks: 1, 2, "
-                                 f"3 ...") from e
-            self.tasks = tsk
+            correct_tasks = []
+            for t in tsk:
+                try:
+                    correct_tasks.append(int(t))
+                except ValueError as e:
+                    r_range = str(t).strip().split("-")
+                    if len(r_range) <= 1:
+                        raise ValueError(f"'tasks' should be integer, list of "
+                                         f"integers or range. e.g. tasks: 0 or "
+                                         f"tasks: 1, 2, 3 ... or 2-5") from e
+                    elif len(r_range) > 2:
+                        raise ValueError(f"Range should be in "
+                                         f"START_TASK-END_TASK format."
+                                         f" e.g. 1-5, 11-15") from e
+                    else:
+                        try:
+                            tmp = sorted([int(x) for x in r_range])
+                            correct_tasks.extend(
+                                list(range(tmp[0], tmp[1] + 1)))
+                        except ValueError:
+                            raise ValueError(
+                                f"Range should have only integers, "
+                                f"you have provided '{r_range}'")
 
-        self._add_mandatory()
+            self.tasks = sorted(list(set(correct_tasks)))
+
+    def _generate_methods(self):
+        temp = []
+        methods = ['star', 'salmon', 'stringtie', 'kallisto']
+        for m in methods:
+            if str(self.data['deseq2']['counts'][m]).lower() == "true":
+                temp.append(m)
+        if len(temp) == 0:
+            raise ValueError("At lest one 'counts' method should be 'true' "
+                             "for DESeq2 analysis. Please check your "
+                             "'config.yaml' file.")
+        self.de_methods = temp
 
     def is_paired(self, srr_id) -> bool:
         df = pd.read_csv(self.data['samples'])
         for _, row in df.iterrows():
-            run = row["run"]
-            if run.strip() == srr_id:
+            runs = row["run"]
+            if runs.strip() == srr_id:
                 return row["is_paired"]
         raise KeyError(f"{srr_id} not found in 'samples.csv'")
 
@@ -79,6 +103,43 @@ class PipeLine:
                 ]
             else:
                 return f"{self.base}/fastq/{srr_id}.sra.fastq"
+
+    def get_deseq2_inputs(self, method):
+        condition_col = self.data['deseq2']['design_column']
+        all_runs = []
+        all_conditions = []
+        df = pd.read_csv(self.data['samples'])
+        for _, row in df.iterrows():
+            all_runs.append(row["run"])
+            all_conditions.append(row[condition_col])
+
+        files = []
+        for srr_id in all_runs:
+            if method == "star":
+                files.append(
+                    f"deseq2/counts/{srr_id}/{srr_id}.star.counts")
+            elif method == "stringite":
+                files.append(
+                    f"deseq2/counts/{srr_id}/{srr_id}.stringtie.counts")
+            elif method == "salmon":
+                files.append(
+                    f"deseq2/counts/{srr_id}/{srr_id}.salmon.counts")
+            elif method == "kallisto":
+                files.append(
+                    f"deseq2/counts/{srr_id}/{srr_id}.kallisto.counts")
+            else:
+                raise ValueError(f"Method '{method}' is not supported for "
+                                 f"DESeq2 analysis yet.")
+
+        files = [f"{self.base}/{x}" for x in files]
+        return files, all_runs, all_conditions
+
+    def get_deseq2_outputs(self):
+        self._generate_methods()
+        files = []
+        for m in self.de_methods:
+            files.append(f"{self.base}/deseq2/analysis/{m}/combined.counts")
+        return files
 
     def output_files(self, srr_id: str, is_paired: bool):
         self._generate_tasks()
@@ -136,6 +197,7 @@ class PipeLine:
 
         return [f"{self.base}/{x}" for x in out]
 
-    def run(self):
-        d = self.fastq("SRR6039671")
-        print(d)
+
+def run(self):
+    d = self.fastq("SRR6039671")
+    print(d)

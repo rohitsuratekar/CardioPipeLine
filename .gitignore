@@ -5,3 +5,4 @@ cardio.log
 .Rproj.user
 .Rhistory
 .snakemake/*
+run.sh

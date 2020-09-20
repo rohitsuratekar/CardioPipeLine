@@ -1,3 +1,6 @@
 run,is_paired,condition
-SRR7882031,true,24
-SRR6039671,false,48
+SRR7882031,true,48
+SRR7882024,true,48
+SRR6039671,false,24
+SRR6039685,false,24
+
