@@ -82,14 +82,12 @@ rule filter_rrna_single:
           sortmerna=config["tools"]["sortmerna"],
           ref_str=lambda wildcards, input: " ".join(
               ["-ref {}".format(x) for x in input.refs]),
-          read_str=lambda wildcards, input: " ".join(
-              ["-reads {}".format(x) for x in input.reads]),
           index_dir="{}/index/sortmerna".format(BASE),
     shell:
          """
          rm -rf {params.index_dir}/kvdb
          
-         {params.sortmerna} {params.ref_str} {params.read_str} -workdir {params.index_dir} -fastx -other -a {threads} -num_alignments 1 -paired_in 
+         {params.sortmerna} {params.ref_str}  -reads {input.reads} -workdir {params.index_dir} -fastx -other -a {threads} -num_alignments 1 -paired_in 
          
          mkdir -p {BASE}/filtered/ 
          

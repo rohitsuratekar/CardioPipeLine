@@ -29,15 +29,21 @@ def generate_deseq_input(wildcards):
     dfs = [x.set_index("gene_id") for x in dfs]
     df = pd.concat(dfs, axis=1, join="inner")
     df = df.reset_index()
-    outfile = f"{config['base']}/deseq2/analysis/{wildcards.METHOD}/temp.counts"
+    outfile = f"{config['base']}/deseq2/analysis/{wildcards.METHOD}/combined.counts"
     df.to_csv(outfile, index=False)
     return outfile
 
 
+rule generate_combined_counts:
+    input:
+         files=get_current_input
+    output: "{BASE}/deseq2/analysis/{METHOD}/combined.counts"
+    run:
+        generate_deseq_input(wildcards)
+
 rule deseq2_with_star:
     input:
-         files=get_current_input,
-         combined=generate_deseq_input
+         combined="{BASE}/deseq2/analysis/{METHOD}/combined.counts"
     params:
           samples=lambda wildcards: get_current_samples(wildcards),
           conditions=lambda wildcards: get_current_conditions(wildcards),
@@ -45,6 +51,6 @@ rule deseq2_with_star:
           design=config['deseq2']['design'],
           reference=config['deseq2']['reference']
     output:
-          log="{BASE}/deseq2/analysis/{METHOD}/combined.counts"
+          log="{BASE}/deseq2/analysis/{METHOD}/analysis.log"
     threads: config["threads"]
     script: "../scripts/deseq2.R"

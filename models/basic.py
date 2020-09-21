@@ -138,7 +138,7 @@ class PipeLine:
         self._generate_methods()
         files = []
         for m in self.de_methods:
-            files.append(f"{self.base}/deseq2/analysis/{m}/combined.counts")
+            files.append(f"{self.base}/deseq2/analysis/{m}/analysis.log")
         return files
 
     def output_files(self, srr_id: str, is_paired: bool):
@@ -189,7 +189,7 @@ class PipeLine:
                 out.append(f"deseq2/counts/{srr_id}/{srr_id}.salmon.counts")
             elif t == TASK_COUNT_KALLISTO:
                 out.append(f"deseq2/counts/{srr_id}/{srr_id}.kallisto.counts")
-            elif t < 16:
+            elif t < 18:
                 pass
             else:
                 raise KeyError(f"Invalid task ID: '{t}'. Check README.md "

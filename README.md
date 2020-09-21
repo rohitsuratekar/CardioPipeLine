@@ -12,6 +12,7 @@ This is simple utility to analyse the RNA-seq data with variety of popular
 * [StringTie](https://ccb.jhu.edu/software/stringtie/) (quantification of BAM files)
 * [NCBI-tools](https://github.com/ncbi/sra-tools) (downloading and conversion from NCBI server)
 * [DEseq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) (differential expression)
+* [MultiQc](https://multiqc.info/) (Quality Control report)
 
 In short, given public run ID from SRA archives (SRRXXXXXXX) it can download
  it from NCBI server, converts to fastq, filters the read, creates indices, maps to
@@ -77,7 +78,8 @@ This pipeline performs tasks in following order. However, you can always
 | 13 | Count Matrix Salmon | `tximport` | quants.sf | counts.csv |
 | 14 | Count Matrix Kallisto | `tximport` | abundance.tsv | counts.csv |
 | 15 | Differential Analysis | `DESeq2` | counts.csv | exp.csv |
-| 16 | Clean up | `shell` | -- | -- |
+| 16 | Quality Control Report | `multiqc` | -- | -- |
+| 17 | Clean up | `shell` | -- | -- |
 
 
 <sup>* There might be many other related outputs. </sup> 

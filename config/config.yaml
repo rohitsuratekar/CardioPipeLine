@@ -10,7 +10,7 @@ threads: 8
 # Or can be list of numbers -> tasks: 1, 2, 3 ...
 # Or can be range -> tasks: 3-8
 # Or can be mix -> tasks: 1, 5, 10-15
-tasks: 1-14
+tasks: 0
 
 # All samples
 # It SHOULD at least have following headers as those will be directly used by
