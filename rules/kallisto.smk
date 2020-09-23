@@ -1,12 +1,18 @@
-BASE = config['base']
+"""
+CardioPipeLine (c) 2020
+
+Author: Rohit Suratekar, ZDG Lab, IIMCB
+
+This deals with all rules related to Kallisto
+"""
 
 rule index_kallisto:
     input:
          kallisto=config["tools"]["kallisto"],
-         transcript=config["genome"]["transcript"]
+         transcript=ancient(config["genome"]["transcript"])
 
-    output: f"{BASE}/index/kallisto/kallisto.idx"
-
+    output: "{BASE}/index/kallisto/kallisto.idx"
+    threads: config["threads"]
     shell:
          "{input.kallisto} index "  # Kallisto index mode
          "-i {output} "  # Filename (not folder) for kallisto
@@ -23,25 +29,25 @@ def make_kallisto_reads(files):
         # length
         frg_sd = config["extra"]["kallisto-standard-deviation"]  # Standard
         # deviation
-        return f"--single -l {frg_length} -s {frg_sd} {files[0]}"
+        return f"--single -l {frg_length} -s {frg_sd} {files}"
 
 
 rule kallisto_quant:
     input:
          kallisto=config["tools"]["kallisto"],
-         k_index=f"{BASE}/index/kallisto/kallisto.idx",
-         gtf=config["genome"]["gtf_annotation"],
-         files=method_reads,
+         k_index=ancient("{BASE}/index/kallisto/kallisto.idx"),
+         gtf=ancient(config["genome"]["gtf_annotation"]),
+         files=get_fastq_files,
     threads: config["threads"]
     output:
-          expand("{folder}/methods/kallisto/{srr}/abundance.tsv",
-                 folder=BASE, srr="{SRR_ID}")
+          "{BASE}/mappings/kallisto/{SRR_ID}/abundance.tsv"
     params:
           reads=lambda wildcards, input: make_kallisto_reads(input.files)
     shell:
          "{input.kallisto} quant "  # Kallisto quant mode
          "-i {input.k_index} "  # Path to the index file
-         "-o {BASE}/methods/kallisto/{wildcards.SRR_ID} "  # Output folder
+         "-o {wildcards.BASE}/mappings/kallisto/{wildcards.SRR_ID} "  # Output 
+         # folder
          "-g {input.gtf} "  # Genome GTF file
          "-t {threads} "  # Number of threads
          "--bias "  # Sequence based bias correction,

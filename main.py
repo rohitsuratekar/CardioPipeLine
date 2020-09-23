@@ -5,8 +5,13 @@
 #
 # Main file for handling all the configuration
 
+import subprocess
 
-from scripts.url_download import download_from_url
+subprocess.run(["snakemake", "--core", "all"])
 
-if __name__ == "__main__":
-    pass
+# from models.basic import PipeLine
+# import os, sys
+#
+# folder = os.path.dirname(sys.argv[0])
+# p = PipeLine(f"{folder}/config/config.yaml")
+# p.run()
