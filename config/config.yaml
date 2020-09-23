@@ -94,6 +94,6 @@ deseq2:
   # following tools (otherwise set 'false'). At least one is mandatory
   counts:
     star: "true"
-    salmon: "false"
-    stringtie: "false"
-    kallisto: "false"
+    salmon: "true"
+    stringtie: "true"
+    kallisto: "true"

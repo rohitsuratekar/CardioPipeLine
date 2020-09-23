@@ -18,6 +18,7 @@ class PipeLine:
         self._data = None
         self.tasks = []
         self.de_methods = []
+        self._last_task = 16
 
     @property
     def data(self) -> dict:
@@ -34,7 +35,7 @@ class PipeLine:
         self.tasks = []
         if isinstance(self.data['tasks'], int):
             if self.data['tasks'] == TASK_ALL:
-                self.tasks = list(range(1, 16))
+                self.tasks = list(range(1, self._last_task + 1))
             else:
                 self.tasks.append(self.data['tasks'])
         else:
@@ -127,6 +128,9 @@ class PipeLine:
             elif method == "kallisto":
                 files.append(
                     f"deseq2/counts/{srr_id}/{srr_id}.kallisto.counts")
+            elif method == "stringtie":
+                files.append(
+                    f"deseq2/counts/{srr_id}/{srr_id}.stringtie.counts")
             else:
                 raise ValueError(f"Method '{method}' is not supported for "
                                  f"DESeq2 analysis yet.")
@@ -189,7 +193,7 @@ class PipeLine:
                 out.append(f"deseq2/counts/{srr_id}/{srr_id}.salmon.counts")
             elif t == TASK_COUNT_KALLISTO:
                 out.append(f"deseq2/counts/{srr_id}/{srr_id}.kallisto.counts")
-            elif t < 18:
+            elif t < self._last_task + 1:
                 pass
             else:
                 raise KeyError(f"Invalid task ID: '{t}'. Check README.md "

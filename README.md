@@ -29,7 +29,7 @@ In order to change the default options, you will need to change appropriate
  management)
 * [pandas](https://pandas.pydata.org/) 
 * `R 4+` (in case you want DESeq2 analysis. Tested on R 4.0.2)
-* `tximport`, `DESeq2`, `AnnotationDbi`, `Rsubread`, `yaml` for `R` related analysis
+* `tximport`, `DESeq2`, `AnnotationDbi`, `Rsubread`, for `R` related analysis
 
 All above dependencies have been successfully tested on Ubuntu 18.04.5
 , Gentoo 5.4.48, Fedora 32.
@@ -60,7 +60,7 @@ This pipeline performs tasks in following order. However, you can always
  select which tasks you want :) 
 
     
-| Task No | Details | Tool Used | Input <sup>#</sup> | Main Output<sup> #, * </sup> |
+| Task No | Details | Tool Used | Input <sup>#</sup> | Output<sup> #, * </sup> |
 | :------ | :----- | :------ | :----| :--- |
 | 0 | All tasks | -- | -- | -- |
 | 1 | Download `.sra` file| `prefetch` | samples.csv | srr.sra |
@@ -68,18 +68,17 @@ This pipeline performs tasks in following order. However, you can always
 | 3 | rRNA filtering | `sortmerna` | srr.fastq | srr.filtered.fastq |
 | 4 | STAR indexing | `star` | genome.fa, anno.gtf | star-idx |
 | 5 | STAR mapping  | `star` | star-idx, srr.filtered.fastq / srr.fastq | srr.bam |
-| 6 | Quantification | `stringtie` | srr.bam, anno.gtf | srr.tsv |
+| 6 | Quantification | `stringtie` | srr.bam, anno.gtf | st.tsv |
 | 7 | Salmon indexing | `salmon` | anno.gtf | salmon-idx |
-| 8 | Salmon mapping | `salmon` | salmon-idx, srr.filtered.fastq / srr.fastq | quants.tsv |
+| 8 | Salmon mapping | `salmon` | salmon-idx, srr.filtered.fastq / srr.fastq | quants.sf |
 | 9 | Kallisto indexing | `kallisto` | anno.gtf | kallisto-idx |
-| 10 | Kallisto mapping | `kallisto` | kallisto-idx, srr.filtered.fastq / srr.fastq | mapping.tsv |
-| 11 | Count Matrix StringTie | `prepDE.py` | ssr.tsv | counts.csv |
-| 12 | Count Matrix Star | `Rsubread` | ssr.bam | counts.csv |
-| 13 | Count Matrix Salmon | `tximport` | quants.sf | counts.csv |
-| 14 | Count Matrix Kallisto | `tximport` | abundance.tsv | counts.csv |
-| 15 | Differential Analysis | `DESeq2` | counts.csv | exp.csv |
-| 16 | Quality Control Report | `multiqc` | -- | -- |
-| 17 | Clean up | `shell` | -- | -- |
+| 10 | Kallisto mapping | `kallisto` | kallisto-idx, srr.filtered.fastq / srr.fastq |abundance.tsv |
+| 11 | Count Matrix StringTie | `prepDE.py` | st.tsv | stringtie.counts |
+| 12 | Count Matrix Star | `Rsubread` | ssr.bam | star.counts |
+| 13 | Count Matrix Salmon | `tximport` | quants.sf | salmon.counts |
+| 14 | Count Matrix Kallisto | `tximport` | abundance.tsv | kallisto.counts |
+| 15 | Differential Analysis | `DESeq2` | *.counts | con1_vs_con2.csv |
+| 16 | Quality Control Report | `multiqc` | -- | quality_report.html |
 
 
 <sup>* There might be many other related outputs. </sup> 
@@ -110,46 +109,18 @@ Editing `config.yaml` and `samples.csv` is probably the most important
 
 Config file has parameter called `base` which provides base folder for all
  the analysis. Every output file crated with this pipeline can be found in
-  this base folder. Let us assume we are analysing `SRR0000001` (paired end) 
-  and `SRR0000002` (single end). We will get following folder structure
-   after full analysis
+  this base folder. Overall output file structure is shown below. More
+   detailed file structure can be found [here](https://github.com/rohitsuratekar/CardioPipeLine/wiki/Base-Folder-Structure). 
    
 ```
 base
 ├── sra
-│   ├── SRR0000001.sra
-│   └── SRR0000002.sra
 ├── fastq
-│   ├── SRR0000001.sra_1.fastq
-│   ├── SRR0000001.sra_2.fastq
-|   └── SRR0000002.sra.fastq
 ├── filtered
-│   ├── SRR0000001.sra.filtered_1.fastq
-│   ├── SRR0000001.sra.filtered_2.fastq
-|   └── SRR0000002.sra.filtered.fastq
 ├── bams
-│   ├── SRR0000001.sra.Aligned.sortedByCoord.out.bam
-|   └── SRR0000002.sra.Aligned.sortedByCoord.out.bam
 ├── index
-│   ├── star / .. 
-|   ├── sortmerna / ..
-|   ├── salmon / ..
-|   └── kallisto / ..
 ├── mappings
-|   ├── stringtie
-|   |   ├── SRR0000001 / ..
-|   |   └── SRR0000002 / .. 
-|   ├── salmon
-|   |   ├── SRR0000001 / ..
-|   |   └── SRR0000002 / .. 
-|   └── kallisto
-|       ├── SRR0000001 / ..
-|       └── SRR0000002 / .. 
 ├── deseq2
-│   ├── star / .. 
-|   ├── stringtie / ..
-|   ├── salmon / ..
-|   └── kallisto / ..
 └── logs
 ```
 
@@ -175,3 +146,32 @@ run,is_paired
 SRR0000001,true
 SRR0000002,false
 ```
+
+If you are performing any DESeq2 analysis, third column specifying
+ conditions is mandatory
+ 
+```
+run,is_paired,condition
+SRR0000001,true,wt
+SRR0000002,false,mt
+```
+Here third column `condition` will be used in DESeq2 analysis. You should
+ update appropriate parameters in `config.yaml` file. For example, Let us
+  assume following sample file
+  
+```
+run,is_paired,time
+SRR0000001,true,48
+SRR0000002,false,24
+```
+In above file, as third column name is `time` and `24` is your reference
+ condition then you should update
+ following in the `config.yaml`
+```
+deseq2:
+    design_column: "time"
+    reference: "24"
+```
+In addition, you should also update `design` parameter from `config.yaml
+` file. For example, in above situation, it can be `design: "~ time"`
+

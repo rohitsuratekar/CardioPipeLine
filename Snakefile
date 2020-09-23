@@ -1,6 +1,6 @@
 import pandas as pd
 from models.basic import PipeLine
-from models.constants import TASK_DESEQ
+from models.constants import TASK_DESEQ, TASK_MULTI_QC
 
 CONFIG_FILE = "config/config.yaml"
 
@@ -22,6 +22,9 @@ def get_final_outputs(wildcards):
         files.extend(PIPELINE.output_files(srr, paired))
     if TASK_DESEQ in PIPELINE.tasks:
         files.extend(PIPELINE.get_deseq2_outputs())
+    # Always keep MultiQC at the top of the input list
+    if TASK_MULTI_QC in PIPELINE.tasks:
+        files.insert(0, f"{PIPELINE.base}/quality.html")
     return files
 
 
@@ -47,3 +50,4 @@ include: "rules/salmon.smk"
 include: "rules/kallisto.smk"
 include: "rules/counts.smk"
 include: "rules/deseq2.smk"
+include: "rules/multiqc.smk"

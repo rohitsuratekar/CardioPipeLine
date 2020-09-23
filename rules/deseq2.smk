@@ -41,7 +41,7 @@ rule generate_combined_counts:
     run:
         generate_deseq_input(wildcards)
 
-rule deseq2_with_star:
+rule deseq2_analysis:
     input:
          combined="{BASE}/deseq2/analysis/{METHOD}/combined.counts"
     params:

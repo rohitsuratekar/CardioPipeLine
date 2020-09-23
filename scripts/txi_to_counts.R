@@ -23,6 +23,10 @@ txi <- tximport::tximport(snakemake@input$file,
                           ignoreTxVersion = TRUE)
 
 colnames(txi$counts) <- snakemake@wildcards$SRR_ID
+# Tximport will generate fractions. We need to convert them to integers by
+# just rounding them. This is what the original class does
+# https://github.com/mikelove/DESeq2/blob/master/R/AllClasses.R
+txi$counts <- round(txi$counts)
 df <- data.frame(txi$counts)
 data.table::setDT(df, keep.rownames = "gene_id")
 
