@@ -37,7 +37,7 @@ All above dependencies have been successfully tested on Ubuntu 18.04.5
 ### Installation
 On installation part, it is good idea to make a new virtual environment and
  install `snakemake` on it. Then download all the tool binaries in your
-  desired place. After that, just clone this repository.
+  desired location. After that, just clone this repository.
 
 ```
 git clone https://github.com/rohitsuratekar/CardioPipeLine.git
@@ -46,12 +46,13 @@ If you do not have `git`, just download the repository and unzip it in your
  desired folder.
 
 After that only thing you need to do is change `config/config.yaml` and
- `samples.csv` file according to your system. and then run following in the
+ `config/samples.csv` file according to your system. and then run following in the
   repository folder
 
 `
 snakemake --core all
 `
+
 Above command will essentially perform everything for you, from downloading
  file from NCBI to making quantification :)
  
