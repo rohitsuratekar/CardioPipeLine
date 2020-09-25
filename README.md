@@ -1,63 +1,63 @@
 # CardioPipeLine
 
-This is simple utility to analyse the RNA-seq data with variety of popular
- tools. It is written in `snakemake` which allows you to sclae it
-  to any system including clusters and cloud computing architectures.
-   Currently it provides analysis with following tools
+This is a simple utility to analyse RNA-seq data with a selection of popular
+ tools. It is written in `snakemake` that allows the user to scale it
+  to any system, including clusters and cloud computing architectures.
+   Currently, it supports analyses with the following tools
 
-* [STAR](https://github.com/alexdobin/STAR) (genome based mapping)
-* [Salmon](https://salmon.readthedocs.io/en/latest/salmon.html) (transcript based mapping)
-* [Kallisto](https://github.com/pachterlab/kallisto) (transcript based  mapping)
+* [STAR](https://github.com/alexdobin/STAR) (genome-based mapping)
+* [Salmon](https://salmon.readthedocs.io/en/latest/salmon.html) (transcript-based mapping)
+* [Kallisto](https://github.com/pachterlab/kallisto) (transcript-based  mapping)
 * [SortMeRNA](https://github.com/biocore/sortmerna) (rRNA filtering)
 * [StringTie](https://ccb.jhu.edu/software/stringtie/) (quantification of BAM files)
 * [NCBI-tools](https://github.com/ncbi/sra-tools) (downloading and conversion from NCBI server)
-* [DEseq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) (differential expression)
-* [MultiQc](https://multiqc.info/) (Quality Control report)
+* [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) (differential expression)
+* [MultiQc](https://multiqc.info/) (quality Control report)
 
-In short, given public run ID from SRA archives (SRRXXXXXXX) it can download
- it from NCBI server, converts to fastq, filters the read, creates indices, maps to
-  genome/transcript and generates quantification. In addition it can perform
+In short, given a public run ID from the SRA archives (SRRXXXXXXX), the pipeline can download
+ the raw data from the NCBI server, convert the files to fastq format, filter the reads, generate indices, map to
+  genome/transcript, and quantify the mapped reads. In addition, it can also carry out
   differential expression analysis.
 
-However, you can use your own FASTA or SRA files for any of the analysis.
-In order to change the default options, you will need to change appropriate
- rules in respective `rules/filename.smk` files.
+
+However, the user can provide their own FASTA or SRA files for the analysis.
+In order to modify the default options, read refer to the appropriate rules in the respective `rules/filename.smk` files.
  
 ### Dependencies
 * `python3+` (tested on Python3.7 and 3.8)
-* [snakemake](https://snakemake.readthedocs.io/en/stable/) (worlflow
+* [snakemake](https://snakemake.readthedocs.io/en/stable/) (workflow
  management)
 * [pandas](https://pandas.pydata.org/) 
-* `R 4+` (in case you want DESeq2 analysis. Tested on R 4.0.2)
-* `tximport`, `DESeq2`, `AnnotationDbi`, `Rsubread`, for `R` related analysis
+* `R 4+` (for DESeq2 analysis; tested on R 4.0.2)
+* `tximport`, `DESeq2`, `AnnotationDbi`, `Rsubread` (for `R` related analyses)
 
-All above dependencies have been successfully tested on Ubuntu 18.04.5
+All the above-mentioned dependencies have been successfully tested on Ubuntu 18.04.5
 , Gentoo 5.4.48, Fedora 32.
 
 ### Installation
-On installation part, it is good idea to make a new virtual environment and
- install `snakemake` on it. Then download all the tool binaries in your
-  desired location. After that, just clone this repository.
+For installation purposes, it is a good idea to make a new python virtual environment and
+ install `snakemake` on it, and then download all the tool binaries in your
+  desired location. Following this, retrive the repository using `git`,
 
 ```
 git clone https://github.com/rohitsuratekar/CardioPipeLine.git
 ```
-If you do not have `git`, just download the repository and unzip it in your
- desired folder.
 
-After that only thing you need to do is change `config/config.yaml` and
- `config/samples.csv` file according to your system. and then run following in the
+Alternatively, download the repository in the desired location.
+
+The only other modification that needs to be done is to edit the `config/config.yaml` and
+ `config/samples.csv` files to specify the location of files on your system, and then run following in the
   repository folder
 
 `
 snakemake --core all
 `
 
-Above command will essentially perform everything for you, from downloading
- file from NCBI to making quantification :)
+The above mentioned command will essentially carry out all the stteps for you, from downloading
+ the file to quantification, while you sit back and relax :)
  
 ### Tasks
-This pipeline performs tasks in following order. However, you can always
+This pipeline carries out tasks. However, you can always
  select which tasks you want :) 
 
     
