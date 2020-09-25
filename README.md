@@ -3,7 +3,7 @@
 This is a simple utility to analyse RNA-seq data with a selection of popular
  tools. It is written in `snakemake` that allows the user to scale it
   to any system, including clusters and cloud computing architectures.
-   Currently, it supports analyses with the following tools
+   Currently, it supports analyses with the following tools;
 
 * [STAR](https://github.com/alexdobin/STAR) (genome-based mapping)
 * [Salmon](https://salmon.readthedocs.io/en/latest/salmon.html) (transcript-based mapping)
@@ -12,7 +12,7 @@ This is a simple utility to analyse RNA-seq data with a selection of popular
 * [StringTie](https://ccb.jhu.edu/software/stringtie/) (quantification of BAM files)
 * [NCBI-tools](https://github.com/ncbi/sra-tools) (downloading and conversion from NCBI server)
 * [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) (differential expression)
-* [MultiQc](https://multiqc.info/) (quality Control report)
+* [MultiQc](https://multiqc.info/) (quality control report)
 
 In short, given a public run ID from the SRA archives (SRRXXXXXXX), the pipeline can download
  the raw data from the NCBI server, convert the files to fastq format, filter the reads, generate indices, map to
@@ -21,8 +21,13 @@ In short, given a public run ID from the SRA archives (SRRXXXXXXX), the pipeline
 
 
 However, the user can provide their own FASTA or SRA files for the analysis.
-In order to modify the default options, read refer to the appropriate rules in the respective `rules/filename.smk` files.
+In order to modify the default options, refer to the appropriate rules in the respective `rules/filename.smk` files.
  
+ 
+ ![cardio](https://user-images.githubusercontent.com/8757115/94266211-1a246400-ff3a-11ea-9f9a-d28527f75014.png)
+
+
+
 ### Dependencies
 * `python3+` (tested on Python3.7 and 3.8)
 * [snakemake](https://snakemake.readthedocs.io/en/stable/) (workflow
@@ -37,7 +42,7 @@ All the above-mentioned dependencies have been successfully tested on Ubuntu 18.
 ### Installation
 For installation purposes, it is a good idea to make a new python virtual environment and
  install `snakemake` on it, and then download all the tool binaries in your
-  desired location. Following this, retrive the repository using `git`,
+  desired location. Following this, retrieve the repository using `git`;
 
 ```
 git clone https://github.com/rohitsuratekar/CardioPipeLine.git
@@ -53,7 +58,7 @@ The only other modification that needs to be done is to edit the `config/config.
 snakemake --core all
 `
 
-The above mentioned command will essentially carry out all the stteps for you, from downloading
+The above mentioned command will essentially carry out all the steps for you, from downloading
  the file to quantification, while you sit back and relax :)
  
 ### Tasks
