@@ -31,6 +31,7 @@ rule make_star_index:
          {input.star} --runMode genomeGenerate --runThreadN {threads} --genomeDir {params.folder} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}
         
         if [ -f Log.out ]; then
+            mkdir -p {BASE}/logs
             mv Log.out {BASE}/logs/STAR.index.log
         fi 
          """
