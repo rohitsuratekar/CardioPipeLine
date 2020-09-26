@@ -21,7 +21,9 @@ In short, given a public run ID from the SRA archives (SRRXXXXXXX), the pipeline
 
 
 However, the user can provide their own FASTA or SRA files for the analysis.
-In order to modify the default options, refer to the appropriate rules in the respective `rules/filename.smk` files.
+In order to modify the default options, refer to the appropriate rules in
+ the respective `rules/filename.smk` files. Please read [wiki](https://github.com/rohitsuratekar/CardioPipeLine/wiki) 
+ for more details.
  
  
  ![cardio](https://user-images.githubusercontent.com/8757115/94266211-1a246400-ff3a-11ea-9f9a-d28527f75014.png)
