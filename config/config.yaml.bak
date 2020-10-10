@@ -15,7 +15,7 @@ threads: 8
 # Or can be list of numbers -> tasks: 1, 2, 3 ...
 # Or can be range -> tasks: 3-8
 # Or can be mix -> tasks: 1, 5, 10-15
-tasks: 18
+tasks: 0
 
 # All samples
 # It SHOULD at least have following headers as those will be directly used by
@@ -54,9 +54,6 @@ genome:
 #
 # stringtie-count : PythonScript provided by StringTie for generating matrix
 # (only needed when performing DE analysis on StringTie results)
-#
-# Note for jellyfish binary: rename the binary to "jellyfish" if not in that
-#  form. This is needed for Trinity de-novo assembly
 
 tools:
   prefetch: "/home/rsuratekar/Documents/Rohit/Tools/sratoolkit.2.10.8-ubuntu64/bin/prefetch"
@@ -69,12 +66,6 @@ tools:
   mashmap: "/home/rsuratekar/Documents/Rohit/Tools/mashmap-Linux64-v2.0/mashmap"
   salmon: "/home/rsuratekar/Documents/Rohit/Tools/salmon-latest_linux_x86_64/bin/salmon"
   kallisto: "/home/rsuratekar/Documents/Rohit/Tools/kallisto/kallisto"
-  trinity: "/home/rsuratekar/Documents/Rohit/Tools/trinityrnaseq-v2.11.0/Trinity"
-  jellyfish: "/home/rsuratekar/Documents/Rohit/Tools/jellyfish"
-  samtools: "/home/rsuratekar/Documents/Rohit/Tools/samtools-1.9/samtools"
-  bowtie2: "/home/rsuratekar/Documents/Rohit/Tools/bowtie2-2.4.2-linux-x86_64/bowtie2"
-  bowtie2-build: "/home/rsuratekar/Documents/Rohit/Tools/bowtie2-2.4.2-linux-x86_64/bowtie2-build"
-  spades: "/home/rsuratekar/Documents/Rohit/Tools/SPAdes-3.14.1-Linux/bin/spades.py"
 
 
 # Extra parameter values needed for Kallisto analysis of Single Layout Reads

@@ -13,6 +13,10 @@ This is a simple utility to analyse RNA-seq data with a selection of popular
 * [NCBI-tools](https://github.com/ncbi/sra-tools) (downloading and conversion from NCBI server)
 * [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) (differential expression)
 * [MultiQc](https://multiqc.info/) (quality control report)
+* [Trinity](https://github.com/trinityrnaseq/trinityrnaseq) (de-novo
+ transcript assembly)
+* [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) (de-novo
+ alignment)
 
 In short, given a public run ID from the SRA archives (SRRXXXXXXX), the pipeline can download
  the raw data from the NCBI server, convert the files to fastq format, filter the reads, generate indices, map to
@@ -87,6 +91,8 @@ This pipeline carries out tasks. However, you can always
 | 14 | Count Matrix Kallisto | `tximport` | abundance.tsv | kallisto.counts |
 | 15 | Differential Analysis | `DESeq2` | *.counts | con1_vs_con2.csv |
 | 16 | Quality Control Report | `multiqc` | -- | quality_report.html |
+| 17 | de-novo Assembly | `trinity` | srr.fastq | trinity.fasta |
+| 18 | de-novo Alignment | `bowtie2` | trinity.fasta | stat.txt |
 
 
 <sup>* There might be many other related outputs. </sup> 

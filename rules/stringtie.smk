@@ -6,8 +6,6 @@ Author: Rohit Suratekar, ZDG Lab, IIMCB
 This deals with all rules related StringTie
 """
 
-BASE = config['base']
-
 # Run StringTie
 rule run_stringtie:
     input:

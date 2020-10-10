@@ -18,7 +18,7 @@ class PipeLine:
         self._data = None
         self.tasks = []
         self.de_methods = []
-        self._last_task = 16
+        self._last_task = 18
 
     @property
     def data(self) -> dict:
@@ -193,6 +193,12 @@ class PipeLine:
                 out.append(f"deseq2/counts/{srr_id}/{srr_id}.salmon.counts")
             elif t == TASK_COUNT_KALLISTO:
                 out.append(f"deseq2/counts/{srr_id}/{srr_id}.kallisto.counts")
+            elif t == TASK_TRINITY:
+                out.append(
+                    f"mappings/trinity/trinity_{srr_id}/Trinity.fasta")
+            elif t == TASK_BOWTIE2:
+                out.append(f"mappings/trinity/trinity_"
+                           f"{srr_id}/align_stats.txt")
             elif t < self._last_task + 1:
                 pass
             else:
