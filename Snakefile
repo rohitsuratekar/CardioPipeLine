@@ -6,9 +6,6 @@ CONFIG_FILE = "config/config.yaml"
 
 configfile: CONFIG_FILE
 
-wildcard_constraints:
-                    SRR_ID="[SRR].*"
-
 SAMPLES_DF = pd.read_csv(config['samples'])
 BASE = config['base']
 PIPELINE = PipeLine(CONFIG_FILE)
@@ -35,6 +32,7 @@ def get_fastq_files(wildcards):
 """
 Important: Rule order is important. Be careful with which rule you use before.
 """
+
 rule all:
     input: get_final_outputs
     threads: config["threads"]
@@ -44,6 +42,7 @@ rule all:
 # files.
 include: "rules/ncbi.smk"
 include: "rules/sortmerna.smk"
+include: "rules/fastqc.smk"
 include: "rules/star.smk"
 include: "rules/stringtie.smk"
 include: "rules/salmon.smk"

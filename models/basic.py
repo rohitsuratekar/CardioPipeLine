@@ -18,7 +18,7 @@ class PipeLine:
         self._data = None
         self.tasks = []
         self.de_methods = []
-        self._last_task = 18
+        self._last_task = 19
 
     @property
     def data(self) -> dict:
@@ -145,6 +145,24 @@ class PipeLine:
             files.append(f"{self.base}/deseq2/analysis/{m}/analysis.log")
         return files
 
+    def _check_quality(self, input_type, srr_id, is_paired):
+        if TASK_FAST_QC not in self.tasks:
+            return []
+        if input_type == TASK_CONVERT_FASTQ:
+            if is_paired:
+                return [f"quality/{srr_id}/{srr_id}.sra_1_fastqc.html",
+                        f"quality/{srr_id}/{srr_id}.sra_2_fastqc.html"]
+            else:
+                return [f"quality/{srr_id}/{srr_id}.sra_fastqc.html"]
+        if input_type == TASK_FILTER_RRNA:
+            if is_paired:
+                return [
+                    f"quality/{srr_id}/{srr_id}.sra.filtered_1_fastqc.html",
+                    f"quality/{srr_id}/{srr_id}.sra.filtered_2_fastqc.html"]
+            else:
+                return [f"quality/{srr_id}/{srr_id}.sra.filtered_fastqc.html"]
+        return []
+
     def output_files(self, srr_id: str, is_paired: bool):
         self._generate_tasks()
         out = []
@@ -159,12 +177,14 @@ class PipeLine:
                     out.append(f"fastq/{srr_id}.sra_2.fastq")
                 else:
                     out.append(f"fastq/{srr_id}.sra.fastq")
+                out.extend(self._check_quality(t, srr_id, is_paired))
             elif t == TASK_FILTER_RRNA:
                 if is_paired:
                     out.append(f"filtered/{srr_id}.sra.filtered_1.fastq")
                     out.append(f"filtered/{srr_id}.sra.filtered_2.fastq")
                 else:
                     out.append(f"filtered/{srr_id}.sra.filtered.fastq")
+                out.extend(self._check_quality(t, srr_id, is_paired))
             elif t == TASK_STAR_INDEX:
                 out.append("index/star/SAindex")
             elif t == TASK_STAR_MAPPING:
@@ -199,6 +219,9 @@ class PipeLine:
             elif t == TASK_BOWTIE2:
                 out.append(f"mappings/trinity/trinity_"
                            f"{srr_id}/align_stats.txt")
+            elif t == TASK_FAST_QC and TASK_CONVERT_FASTQ not in self.tasks:
+                out.extend(
+                    self._check_quality(TASK_CONVERT_FASTQ, srr_id, is_paired))
             elif t < self._last_task + 1:
                 pass
             else:
